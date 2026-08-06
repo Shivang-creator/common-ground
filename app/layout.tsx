@@ -45,9 +45,19 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <div className="min-h-dvh flex flex-col">
           <header className="no-print border-b" style={{ borderColor: "var(--border)" }}>
             <div className="mx-auto w-full max-w-5xl px-4 py-3 flex items-center justify-between gap-3">
-              <a href="/" className="font-semibold tracking-tight text-lg" style={{ color: "var(--text)" }}>
-                Common&nbsp;Ground
-              </a>
+              <div className="flex items-center gap-4 sm:gap-6">
+                <a href="/" className="font-semibold tracking-tight text-lg" style={{ color: "var(--text)" }}>
+                  Common&nbsp;Ground
+                </a>
+                <nav aria-label="Sections" className="flex gap-3 text-sm">
+                  <a href="/" className="underline-offset-4 hover:underline" style={{ color: "var(--text-muted)" }}>
+                    Read a brief
+                  </a>
+                  <a href="/group" className="underline-offset-4 hover:underline" style={{ color: "var(--text-muted)" }}>
+                    Split the work
+                  </a>
+                </nav>
+              </div>
               <DisplaySettings />
             </div>
           </header>
