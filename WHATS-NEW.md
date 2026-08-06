@@ -130,6 +130,22 @@ can't drift out of date and can't claim a check that doesn't exist. A tool that
 makes judgements about someone's assignment should be readable without cloning a
 repo — this is also the page to point a judge at.
 
+## ✅ The flow now joins up
+
+The decoder found the parts of the work, but the group page was making you retype
+them. That seam was exactly the friction this project exists to remove — and it
+broke the one flow a demo wants to show.
+
+Now: read a brief → **"The parts this splits into"** → one button carries them to
+the split. Verified live: a real brief returns workstreams and hands them over.
+
+## ✅ SUBMISSION.md — your Sunday morning, mostly written
+
+A full Devpost description draft, the design-rationale table (every decision mapped
+to the research finding behind it), and a **3-minute video script** timed section by
+section. One section is deliberately left blank: how neurodivergent users shaped it.
+That's the bit only you can fill in.
+
 ## Not built yet
 
 - **Demo video** — Saturday, with you
@@ -174,3 +190,8 @@ documents all four tools and the reasoning behind each. Accessibility audit acro
 five pages: fixed an invalid `aria-pressed` on a `<label>` in the group form and made
 keyboard focus visible on the hidden radios via `:focus-within`. Heading order verified
 correct, every input labelled, no colour-only meaning. Five pages live at HTTP 200.
+
+**07 Aug, ~04:20** — Joined the flow: decoder workstreams now carry into the group page
+instead of being retyped. Added SUBMISSION.md with a Devpost draft, the design-rationale
+table and a 3-minute video script. Five pages live at HTTP 200; live API confirmed
+returning 18 checks and workstreams.
