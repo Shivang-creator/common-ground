@@ -84,13 +84,49 @@ No model call in the allocation, deliberately. If a group disputes the split, "t
 AI decided" is not an acceptable answer — so it's a deterministic algorithm where
 every line can be explained.
 
+## ✅ Decision log — built and live
+
+**/log** — "A decision is only a decision once it's written down."
+
+The design point: **silence is never counted as agreement.** Each entry shows who
+has said yes and who has *not answered*, displayed as its own state, with the UI
+saying plainly that not answering is not the same as disagreeing. And raising
+something in writing is a first-class entry — you never have to win a turn in a
+live conversation to get something on the record.
+
+There's a private, on-device-only panel: *"things you raised that nobody's
+answered."* Never aggregated, never shared, never sent anywhere. Self-advocacy
+support is what self-advocates recommend *instead of* teaching people to
+communicate differently.
+
+## ✅ Share with your teacher — built and live, and inverted
+
+**/share** — I did **not** build a teacher dashboard. A tool that reports on
+students to an authority figure is surveillance regardless of intent.
+
+So it's reversed: **the group composes this page and the group decides whether to
+send it.** No teacher login, no dashboard, no feed of groups. A teacher sees it
+only because a group handed it over. Everything on it is a fact about the
+*project* — decisions recorded, decisions not yet confirmed, questions open five
+days or more, parts of the work with no owner. No participation score, no
+per-student count.
+
+This is the version of your "teachers understand the student better" instinct
+that survives the ethics review.
+
+## ✅ Checks: 12 → 18
+
+Added the politest ways marks get lost: *"you may wish to"* / *"ideally"* /
+*"where possible"* (required or optional?), unexplained acronyms, no submission
+method, no extensions policy, no group size, and several parts with no weighting.
+
+Verified live: **18 checks, 23 findings** on the sample brief, and the conditional
+checks correctly stay quiet when a brief does answer them.
+
 ## Not built yet
 
-- **Decision log**
-- **Teacher view** — group process health only, never individuals
-- **Demo video**
-
-I'm continuing on group setup overnight.
+- **Demo video** — Saturday, with you
+- Anything you want changed after reading this
 
 ---
 
@@ -120,3 +156,8 @@ and the deploy auto-updates from `main`.
 **07 Aug, ~03:00** — Group setup shipped (`/group`). Deterministic preference-based
 allocation + working agreement. Nav added to the header. Both pages verified HTTP 200
 in production. Continuing on the decision log next.
+
+**07 Aug, ~03:30** — Decision log (`/log`) and Share (`/share`) shipped. Checks 12 → 18.
+All four pages verified HTTP 200 in production, live API confirmed running 18 checks
+with AI on. All four planned features are now built — remaining work is your review,
+a real user's feedback if anyone replied on Discord, and the demo video.
