@@ -201,6 +201,31 @@ you to read. There is no correct answer."* We offer a preference, not a remedy.
 
 ---
 
+## Tests
+
+```bash
+npm test    # 56 tests
+```
+
+The one that matters most is **"a complete brief stays quiet"**. A checker that
+flags something on every input is worse than no checker — it trains people to
+ignore it, and it tells a student their perfectly clear assignment is full of
+problems. So a brief that genuinely answers everything must produce **zero
+blockers**.
+
+That test failed the first time it ran, and caught a real false positive: a brief
+saying *"bring a one page outline to the seminar in week 6 for feedback"* was being
+told it had no checkpoint, because the check looked for "draft" and "formative" but
+not "outline" — the word briefs actually use.
+
+The suite also covers determinism in the role allocation (same input, same output,
+regardless of the order people were entered), tolerant JSON parsing that throws
+rather than guessing, and 9 pathological inputs including empty, unicode, regex
+metacharacters and HTML.
+
+One test enforces a product rule directly: **no finding may ever contain clinical
+or diagnostic language.** This tool describes documents, never readers.
+
 ## Run it yourself
 
 ```bash

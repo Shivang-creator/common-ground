@@ -97,6 +97,10 @@ written into the code:
 - **Degrades to nothing.** No key, a timeout, a malformed reply → the checks stand
   alone. A missing interpretation is fine; a confidently wrong one is not.
 
+It is covered by **56 tests**, including one that enforces a product rule directly:
+no finding may ever contain clinical or diagnostic language. This tool describes
+documents, never readers.
+
 **The app works with no API key at all.** The AI improves the output; it is never
 load-bearing. That was deliberate — a tool for people who are routinely failed by
 technology should not fail when a service is down.

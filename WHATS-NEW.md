@@ -146,6 +146,25 @@ to the research finding behind it), and a **3-minute video script** timed sectio
 section. One section is deliberately left blank: how neurodivergent users shaped it.
 That's the bit only you can fill in.
 
+## ✅ 56 tests — and they found a bug
+
+`npm test`. The one that matters is **"a complete brief stays quiet"**: a checker
+that flags something on every input is worse than no checker.
+
+**It failed on the first run.** A brief saying *"bring a one page outline to the
+seminar in week 6 for feedback"* was being told it had no checkpoint — the check
+looked for "draft" and "formative" but not "outline", which is the word briefs
+actually use. Fixed the check, not the test. That's a false positive a judge or a
+tester would have hit.
+
+Also covers: role allocation determinism (same answer across 20 runs and any input
+order), the agreement always taking the widest stated need *without naming who
+needed it*, tolerant JSON parsing that throws rather than guessing, and 9
+pathological inputs (empty, unicode, regex metacharacters, HTML, a 60k-word brief).
+
+One test enforces a product rule directly: **no finding may ever contain clinical
+or diagnostic language.** Good number to quote in the submission.
+
 ## Not built yet
 
 - **Demo video** — Saturday, with you
@@ -195,3 +214,7 @@ correct, every input labelled, no colour-only meaning. Five pages live at HTTP 2
 instead of being retyped. Added SUBMISSION.md with a Devpost draft, the design-rationale
 table and a 3-minute video script. Five pages live at HTTP 200; live API confirmed
 returning 18 checks and workstreams.
+
+**07 Aug, ~04:45** — Added a 56-test suite (vitest). It immediately caught a false
+positive in the checkpoint check and I fixed the check. All five pages still live at
+HTTP 200. README documents the testing approach.
