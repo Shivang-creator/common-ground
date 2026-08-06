@@ -326,6 +326,144 @@ export const CHECKS: Check[] = [
       ];
     },
   },
+  /* — instruction: the optional-or-not trap — */
+  {
+    id: "instruction.maybe-optional",
+    category: "instruction",
+    describes: "Softened wording where it's unclear if something is required or optional.",
+    run: (brief) => {
+      const TERMS = [
+        "you may wish to", "you might want to", "you may want to", "consider including",
+        "you could", "it would be good to", "ideally", "where possible", "if appropriate",
+        "feel free to", "you are encouraged to", "it is recommended",
+      ];
+      const hits = findTerms(brief, TERMS);
+      return hits.slice(0, 4).map(({ term, excerpt }) => ({
+        id: "instruction.maybe-optional",
+        category: "instruction" as const,
+        severity: "friction" as const,
+        title: `"${term}" — required, or genuinely optional?`,
+        excerpt,
+        why: "Politely-worded instructions are one of the most common places marks are quietly lost. Some markers write suggestions this way; others write requirements this way. Read literally, it is optional. Read as most people mean it, it is not.",
+        question: `The brief says "${term}" here — is that something we have to do, or genuinely up to us?`,
+      }));
+    },
+  },
+
+  /* — assumed: unexplained acronyms — */
+  {
+    id: "assumed.acronyms",
+    category: "assumed",
+    describes: "Acronyms used without being spelled out anywhere in the brief.",
+    run: (brief) => {
+      const found = new Map<string, string>();
+      const re = /(?<![A-Za-z])([A-Z]{2,6})(?![A-Za-z])/g;
+      const COMMON = new Set(["AI","UK","US","USA","EU","UN","PDF","URL","FAQ","OK","TV","CV","ID","IT","AM","PM","PhD","BBC","NHS","CEO","DIY","API"]);
+      let m: RegExpExecArray | null;
+      while ((m = re.exec(brief))) {
+        const a = m[1];
+        if (COMMON.has(a) || found.has(a)) continue;
+        // Spelled out nearby? e.g. "Life Cycle Assessment (LCA)"
+        const around = brief.slice(Math.max(0, m.index - 120), m.index);
+        if (new RegExp(a.split("").join("\\w+\\s+"), "i").test(around)) continue;
+        found.set(a, sentenceAround(brief, m.index));
+      }
+      return [...found.entries()].slice(0, 3).map(([a, excerpt]) => ({
+        id: "assumed.acronyms",
+        category: "assumed" as const,
+        severity: "note" as const,
+        title: `"${a}" is never spelled out`,
+        excerpt,
+        why: "Course shorthand is invisible to whoever wrote it and opaque to anyone who missed the class where it was introduced. Asking is not a sign you are behind.",
+        question: `What does "${a}" stand for in this context?`,
+      }));
+    },
+  },
+
+  /* — process: how do I actually hand it in — */
+  {
+    id: "process.no-submission-method",
+    category: "process",
+    describes: "No statement of where or how the work is submitted.",
+    run: (brief) => {
+      if (has(brief, ["submit via", "upload", "hand in to", "turnitin", "moodle", "canvas", "blackboard", "email it", "portal", "submission link", "in person", "hard copy"])) return [];
+      return [
+        {
+          id: "process.no-submission-method",
+          category: "process",
+          severity: "friction",
+          title: "It doesn't say how to hand it in",
+          why: "Worth settling early rather than at the deadline. Submission systems have their own quirks — file types, size limits, whether a late click counts.",
+          question: "Where do we submit this, and is there a file format you need?",
+        },
+      ];
+    },
+  },
+
+  /* — process: what if something goes wrong — */
+  {
+    id: "process.no-late-policy",
+    category: "process",
+    describes: "No mention of extensions or what happens if it's late.",
+    run: (brief) => {
+      if (has(brief, ["extension", "late submission", "late penalt\\w+", "mitigating", "extenuating", "deferral"])) return [];
+      return [
+        {
+          id: "process.no-late-policy",
+          category: "process",
+          severity: "note",
+          title: "Nothing about extensions or lateness",
+          why: "Most people never need this. Knowing the route in advance means that if something does go wrong, asking is a step you already know how to take rather than a thing to panic about.",
+          question: "If something goes wrong and we need more time, what's the process?",
+        },
+      ];
+    },
+  },
+
+  /* — group: how big — */
+  {
+    id: "group.no-size",
+    category: "group",
+    describes: "Group work with no stated group size.",
+    run: (brief) => {
+      if (!mentionsGroup(brief)) return [];
+      if (/\bgroups? of\s+(\d+|two|three|four|five|six)\b/i.test(brief)) return [];
+      if (/\b(pairs?|in twos)\b/i.test(brief)) return [];
+      return [
+        {
+          id: "group.no-size",
+          category: "group",
+          severity: "friction",
+          title: "Group work, but no group size",
+          why: "Group size changes how the work should be split and how much each person carries. It also decides whether you are choosing your own group or being placed in one — which is a much bigger question for some people than it looks.",
+          question: "How many people per group, and do we form our own or are they assigned?",
+        },
+      ];
+    },
+  },
+
+  /* — assessment: parts without weighting — */
+  {
+    id: "assessment.no-weighting",
+    category: "assessment",
+    describes: "Several distinct parts, but no indication of what each is worth.",
+    run: (brief) => {
+      const partWords = (brief.match(/\b(part|section|component|element|task)\s*(\d+|one|two|three|a|b|c)\b/gi) ?? []).length;
+      const listed = (brief.match(/^\s*[-*\u2022]\s+/gm) ?? []).length;
+      if (partWords < 2 && listed < 3) return [];
+      if (/\b\d{1,3}\s*%/.test(brief) || has(brief, ["weighted", "weighting", "worth"])) return [];
+      return [
+        {
+          id: "assessment.no-weighting",
+          category: "assessment",
+          severity: "friction",
+          title: "Several parts, no sense of what each is worth",
+          why: "Without weightings the only safe approach is to treat every part as equally important, which is rarely true and is the most expensive way to spend your time.",
+          question: "How are the marks split across the different parts?",
+        },
+      ];
+    },
+  },
 ];
 
 export function runChecks(brief: string): { findings: import("./types").Finding[]; checksRun: number } {
