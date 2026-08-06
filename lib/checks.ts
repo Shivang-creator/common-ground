@@ -293,7 +293,13 @@ export const CHECKS: Check[] = [
     category: "process",
     describes: "No milestone or check-in between now and the deadline.",
     run: (brief) => {
-      if (has(brief, ["checkpoint", "milestone", "draft", "interim", "progress", "check-in", "check in", "formative", "feedback session", "proposal"])) return [];
+      // "outline" and "peer review" are how most briefs actually describe a midpoint;
+      // "feedback session"/"formative" are the words the policy documents use. Both matter.
+      if (has(brief, [
+        "checkpoint", "milestone", "draft", "interim", "progress", "check-in", "check in",
+        "formative", "feedback session", "proposal", "outline", "peer review", "peer-review",
+        "work in progress", "first version",
+      ])) return [];
       return [
         {
           id: "process.no-checkpoint",
