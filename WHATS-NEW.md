@@ -123,6 +123,13 @@ method, no extensions policy, no group size, and several parts with no weighting
 Verified live: **18 checks, 23 findings** on the sample brief, and the conditional
 checks correctly stay quiet when a brief does answer them.
 
+## ✅ /checks — every check, listed
+
+**/checks** renders the full list straight from the array the engine runs, so it
+can't drift out of date and can't claim a check that doesn't exist. A tool that
+makes judgements about someone's assignment should be readable without cloning a
+repo — this is also the page to point a judge at.
+
 ## Not built yet
 
 - **Demo video** — Saturday, with you
@@ -161,3 +168,9 @@ in production. Continuing on the decision log next.
 All four pages verified HTTP 200 in production, live API confirmed running 18 checks
 with AI on. All four planned features are now built — remaining work is your review,
 a real user's feedback if anyone replied on Discord, and the demo video.
+
+**07 Aug, ~03:55** — Added `/checks` (all 18, generated from the engine). README now
+documents all four tools and the reasoning behind each. Accessibility audit across all
+five pages: fixed an invalid `aria-pressed` on a `<label>` in the group form and made
+keyboard focus visible on the hidden radios via `:focus-within`. Heading order verified
+correct, every input labelled, no colour-only meaning. Five pages live at HTTP 200.
