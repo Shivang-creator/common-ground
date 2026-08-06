@@ -65,10 +65,27 @@ claiming something the research doesn't support.
 
 ---
 
-## Not built yet — tonight's work with you
+## ✅ Group setup — now built and live
 
-- **Group setup** — the private preference form → proposed explicit roles. Types
-  are written (`MemberPrefs`, `RoleProposal`), UI isn't.
+**https://common-ground-shivang-creator-shivcreates.vercel.app/group**
+
+Everyone answers the same four questions — which parts they want (tapped in
+preference order), how they'd rather contribute, how much notice they want before
+a meeting, how they want feedback. Then it produces the split, with a reason
+attached to every allocation that quotes what that person actually chose.
+
+**The bit I'm most pleased with — "How this group works".** It builds a working
+agreement that *accommodates the widest stated need and never says whose it was*.
+If one person asks for several days' notice, the group norm becomes several days'
+notice — stated as a group rule with no name attached. That's the whole mechanism
+by which someone gets what they need without disclosing why they need it.
+
+No model call in the allocation, deliberately. If a group disputes the split, "the
+AI decided" is not an acceptable answer — so it's a deterministic algorithm where
+every line can be explained.
+
+## Not built yet
+
 - **Decision log**
 - **Teacher view** — group process health only, never individuals
 - **Demo video**
@@ -94,3 +111,12 @@ I'm continuing on group setup overnight.
 
 Reply from your phone with what to change and I'll queue it. The repo is public
 and the deploy auto-updates from `main`.
+
+
+---
+
+## Overnight log
+
+**07 Aug, ~03:00** — Group setup shipped (`/group`). Deterministic preference-based
+allocation + working agreement. Nav added to the header. Both pages verified HTTP 200
+in production. Continuing on the decision log next.
