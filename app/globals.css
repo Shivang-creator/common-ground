@@ -214,3 +214,14 @@ textarea::placeholder, input::placeholder { color: var(--text-muted); opacity: 1
   .no-print { display: none !important; }
   body { background: #fff; color: #000; }
 }
+
+/*
+  A visually-hidden radio inside a styled label keeps native radio semantics —
+  arrow-key navigation, group announcement, checked state — which aria-pressed on
+  a label would not. But hiding the input also hides its focus ring, so the label
+  wears it instead. Keyboard users must always be able to see where they are.
+*/
+.radio-chip:focus-within {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}

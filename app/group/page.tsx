@@ -81,8 +81,7 @@ export default function GroupPage() {
         {options.map((o) => (
           <label
             key={o.v}
-            className="btn btn-quiet px-3 py-1.5 text-sm cursor-pointer"
-            aria-pressed={value === o.v}
+            className="btn btn-quiet px-3 py-1.5 text-sm cursor-pointer radio-chip"
             style={
               value === o.v
                 ? { background: "var(--accent-soft)", borderColor: "var(--accent)" }
