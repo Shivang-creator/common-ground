@@ -43,17 +43,63 @@ Group work makes it worse. The finding that shaped this project:
 
 ## What Common Ground does
 
-Paste an assignment brief. It returns:
+Four tools, all built on the same idea: take something that is normally decided
+implicitly, and write it down.
 
-- **What finished looks like** — a concrete, checkable list, derived only from
-  what the brief actually says
-- **What you hand in** — the deliverables the brief implies
-- **Questions worth asking** — grouped by kind, each one quoting the exact text
-  that triggered it, explaining why it matters, and giving you a sentence you can
-  send straight to a teacher
+### 1 · Read a brief — `/`
+Paste an assignment. It returns **what finished looks like** (a concrete,
+checkable list, derived only from what the brief says), **what you hand in**, and
+**questions worth asking** — grouped by kind, each quoting the exact text that
+triggered it and giving you a sentence you can send straight to a teacher.
 
 It does not rewrite the brief. It does not write the assignment. It names the gaps
-and hands them back to you as questions.
+and hands them back as questions.
+
+### 2 · Split the work — `/group`
+Roles usually get decided by talking, fast, in the first meeting. That reliably
+favours whoever is most comfortable negotiating out loud.
+
+Instead: everyone answers the same four questions — which parts they want, how
+they'd rather contribute, how much notice they want before a meeting, how they
+want feedback. The split comes out of stated preferences, and **every allocation
+carries a reason quoting what that person chose**.
+
+It ends with a **working agreement** that accommodates the widest stated need and
+never says whose it was. If one person asks for several days' notice, the group
+norm becomes several days' notice — stated as a group rule, with no name attached.
+**That is the mechanism by which someone gets what they need without disclosing
+why they need it.**
+
+There is no model call in the allocation, deliberately. If a group disputes the
+split, *"the AI decided"* is not an acceptable answer.
+
+### 3 · Decisions — `/log`
+*A decision is only a decision once it is written down.* Otherwise agreement has
+to be inferred from tone, silence and who didn't object.
+
+**Silence is never counted as a yes.** Each entry shows who has agreed and who has
+*not answered* — displayed as its own state, with the page saying plainly that not
+answering is not the same as disagreeing. Raising something in writing is a
+first-class entry: you never have to win a turn in a live conversation to get
+something on the record.
+
+There is also a private, **on-device-only** panel showing things *you* raised that
+nobody answered. Never aggregated, never shared, never sent anywhere.
+
+### 4 · Share — `/share`
+The obvious version of this is a teacher dashboard that watches groups. **That is
+deliberately not what this is.** A tool that reports on students to an authority
+figure is surveillance regardless of intent.
+
+So it is reversed: **the group composes this page, and the group decides whether
+to send it.** No teacher login, no dashboard, no feed of groups. Everything on it
+is a fact about the *project* — decisions not yet confirmed, questions open five
+days or more, parts of the work with no owner. No participation score, no
+per-student count, no judgement about any person.
+
+### Also: `/checks`
+Every check, listed straight from the array the engine runs, so the tool can be
+read without cloning it.
 
 ---
 
@@ -98,17 +144,17 @@ Two layers. The first does the work; the second improves it.
 
 ### 1. Deterministic checks — no key required
 
-12 checks across 7 categories, each a pure function over the brief text:
+18 checks across 7 categories, each a pure function over the brief text:
 
 | Category | Looks for |
 |---|---|
 | **The finish line** | No length · no deliverable format · no deadline |
-| **What you're being asked to do** | 14 instruction verbs that markers read differently — *discuss, explore, critically analyse, engage with, reflect on…* |
-| **How it's marked** | No rubric, criteria or weighting mentioned |
+| **What you're being asked to do** | 14 instruction verbs markers read differently — *discuss, explore, critically analyse, engage with, reflect on…* — plus softened wording where required-vs-optional is unclear (*"you may wish to"*, *"ideally"*, *"where possible"*) |
+| **How it's marked** | No rubric or criteria mentioned · several parts with no weighting |
 | **How much** | Unquantified amounts — *some, several, appropriate, sufficient* |
-| **Assumed knowledge** | *obviously, simply, as discussed, the usual format* — the hidden curriculum, in words |
-| **Working as a group** | No role guidance · unclear whether the mark is shared or individual · no route if it goes wrong |
-| **Between now and the deadline** | No checkpoint · sources expected but not defined |
+| **Assumed knowledge** | *obviously, simply, as discussed, the usual format* — the hidden curriculum, in words — plus acronyms never spelled out |
+| **Working as a group** | No role guidance · unclear whether the mark is shared or individual · no route if it goes wrong · no group size |
+| **Between now and the deadline** | No checkpoint · sources expected but not defined · no submission method · no extensions policy |
 
 Every finding quotes the exact text that triggered it. Nobody has to trust a
 model's opinion about their assignment.

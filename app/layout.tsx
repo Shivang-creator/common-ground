@@ -62,6 +62,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   <a href="/share" className="underline-offset-4 hover:underline" style={{ color: "var(--text-muted)" }}>
                     Share
                   </a>
+                  <a href="/checks" className="underline-offset-4 hover:underline" style={{ color: "var(--text-muted)" }}>
+                    Checks
+                  </a>
                 </nav>
               </div>
               <DisplaySettings />
