@@ -56,6 +56,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   <a href="/group" className="underline-offset-4 hover:underline" style={{ color: "var(--text-muted)" }}>
                     Split the work
                   </a>
+                  <a href="/log" className="underline-offset-4 hover:underline" style={{ color: "var(--text-muted)" }}>
+                    Decisions
+                  </a>
                 </nav>
               </div>
               <DisplaySettings />
