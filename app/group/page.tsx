@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import type { MemberPrefs } from "@/lib/types";
 import { allocate, type AllocationResult } from "@/lib/roles";
 
@@ -36,6 +36,22 @@ export default function GroupPage() {
   const [streamsRaw, setStreamsRaw] = useState("");
   const [members, setMembers] = useState<MemberPrefs[]>([blank(1), blank(2)]);
   const [result, setResult] = useState<AllocationResult | null>(null);
+  const [handedOver, setHandedOver] = useState(false);
+
+  // If the brief decoder found the parts of the work, start from those rather than
+  // making someone retype them. Cleared once used, so it never silently reappears.
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("cg:workstreams");
+      if (!raw) return;
+      const names: string[] = JSON.parse(raw);
+      if (Array.isArray(names) && names.length) {
+        setStreamsRaw(names.join("\n"));
+        setHandedOver(true);
+      }
+      localStorage.removeItem("cg:workstreams");
+    } catch {}
+  }, []);
 
   const workstreams = streamsRaw
     .split("\n")
@@ -126,8 +142,9 @@ export default function GroupPage() {
           The parts of the work
         </label>
         <p className="text-sm" style={{ color: "var(--text-muted)" }}>
-          One per line. If you decoded the brief on the home page, use the workstreams it
-          found.
+          {handedOver
+            ? "Carried over from the brief you just read. Edit them freely — the brief is a starting point, not the last word."
+            : "One per line. If you read a brief on the home page first, the parts it found are carried over automatically."}
         </p>
         <textarea
           id="streams"

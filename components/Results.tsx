@@ -146,6 +146,48 @@ export function Results({ result }: { result: DecodeResult }) {
         </section>
       )}
 
+      {/* Handoff into the group page — the decoder already found the parts. */}
+      {interpretation?.workstreams?.length ? (
+        <section aria-labelledby="ws-h" className="card p-5 sm:p-6">
+          <h2 id="ws-h" className="text-xl font-semibold mb-1">
+            The parts this splits into
+          </h2>
+          <p className="text-sm mb-4 measure" style={{ color: "var(--text-muted)" }}>
+            Separable pieces of the work, read out of the brief. Nothing is assigned to
+            anyone here — that only happens once everyone has said what they&rsquo;d like.
+          </p>
+          <ul className="space-y-2 mb-4">
+            {interpretation.workstreams.map((w, i) => (
+              <li key={i} className="flex gap-2.5">
+                <span aria-hidden="true" style={{ color: "var(--accent)" }}>
+                  •
+                </span>
+                <span>
+                  <span className="font-medium">{w.name}</span>
+                  {w.description && (
+                    <span style={{ color: "var(--text-muted)" }}> — {w.description}</span>
+                  )}
+                </span>
+              </li>
+            ))}
+          </ul>
+          <a
+            href="/group"
+            className="btn btn-primary px-5 py-2.5 inline-block no-print"
+            onClick={() => {
+              try {
+                localStorage.setItem(
+                  "cg:workstreams",
+                  JSON.stringify(interpretation.workstreams!.map((w) => w.name)),
+                );
+              } catch {}
+            }}
+          >
+            Use these to split the work
+          </a>
+        </section>
+      ) : null}
+
       {/* The questions — the actual product */}
       {findings.length > 0 && (
         <section aria-labelledby="questions-h">
