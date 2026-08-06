@@ -259,7 +259,13 @@ export default function GroupPage() {
             type="button"
             className="btn btn-primary px-5 py-2.5"
             disabled={!ready}
-            onClick={() => setResult(allocate(members, workstreams))}
+            onClick={() => {
+              const r = allocate(members, workstreams);
+              setResult(r);
+              try {
+                localStorage.setItem("cg:roles", JSON.stringify(r));
+              } catch {}
+            }}
           >
             Work out the split
           </button>
