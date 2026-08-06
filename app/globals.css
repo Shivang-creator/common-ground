@@ -1,26 +1,216 @@
 @import "tailwindcss";
 
+/*
+  Accessibility is the architecture here, not a setting bolted on at the end.
+
+  Everything below is driven by data-* attributes on <html>, set by the Display
+  panel and persisted to localStorage. Defaults are deliberately calm: generous
+  spacing, no motion, muted colour, nothing that moves on its own.
+
+  Explicit non-features: no timers, no streaks, no progress pressure, no
+  notifications, no sound. Masking research links performance pressure to real
+  harm, so none of the usual engagement mechanics appear anywhere in this product.
+*/
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --font-scale: 1;
+  --line-height: 1.65;
+  --letter-spacing: 0em;
+  --word-spacing: 0em;
+  --measure: 68ch;
+  --radius: 0.75rem;
+
+  --bg: #fbfaf8;
+  --surface: #ffffff;
+  --surface-2: #f4f2ee;
+  --border: #e0dcd4;
+  --text: #23211e;
+  --text-muted: #5c574f;
+  --accent: #2f5d50;
+  --accent-soft: #e6efec;
+  --blocker: #8c2f18;
+  --blocker-soft: #fbeae5;
+  --friction: #7a5510;
+  --friction-soft: #fbf2e0;
+  --note: #3d5068;
+  --note-soft: #eaeff5;
+  --focus: #1b6ac9;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+:root[data-theme="dark"] {
+  --bg: #171916;
+  --surface: #1f221e;
+  --surface-2: #272b26;
+  --border: #3a3f38;
+  --text: #ece9e3;
+  --text-muted: #a8a49a;
+  --accent: #86c7b2;
+  --accent-soft: #23342e;
+  --blocker: #f0a58c;
+  --blocker-soft: #3a221b;
+  --friction: #e8c583;
+  --friction-soft: #362c18;
+  --note: #a8c0dc;
+  --note-soft: #1e2833;
+  --focus: #7db4f5;
 }
 
 @media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  :root:not([data-theme="light"]) {
+    --bg: #171916;
+    --surface: #1f221e;
+    --surface-2: #272b26;
+    --border: #3a3f38;
+    --text: #ece9e3;
+    --text-muted: #a8a49a;
+    --accent: #86c7b2;
+    --accent-soft: #23342e;
+    --blocker: #f0a58c;
+    --blocker-soft: #3a221b;
+    --friction: #e8c583;
+    --friction-soft: #362c18;
+    --note: #a8c0dc;
+    --note-soft: #1e2833;
+    --focus: #7db4f5;
   }
 }
 
+/* Higher contrast, for anyone who wants it — not only for "low vision". */
+:root[data-contrast="high"] {
+  --bg: #ffffff;
+  --surface: #ffffff;
+  --surface-2: #ffffff;
+  --border: #1a1a1a;
+  --text: #000000;
+  --text-muted: #1a1a1a;
+  --accent: #00453a;
+  --accent-soft: #ffffff;
+  --blocker-soft: #ffffff;
+  --friction-soft: #ffffff;
+  --note-soft: #ffffff;
+}
+:root[data-contrast="high"][data-theme="dark"] {
+  --bg: #000000;
+  --surface: #000000;
+  --surface-2: #000000;
+  --border: #ffffff;
+  --text: #ffffff;
+  --text-muted: #f0f0f0;
+  --accent: #9ff0d8;
+  --accent-soft: #000000;
+  --blocker-soft: #000000;
+  --friction-soft: #000000;
+  --note-soft: #000000;
+}
+
+/*
+  Font choice is offered as a preference, not a remedy. Evidence for specialised
+  "dyslexia fonts" improving reading speed is mixed at best; evidence that people
+  have strong and differing preferences is not. So: pick what feels easier to read.
+*/
+:root[data-font="sans"] { --font-body: var(--font-inter), ui-sans-serif, system-ui, sans-serif; }
+:root[data-font="serif"] { --font-body: ui-serif, Georgia, "Times New Roman", serif; }
+:root[data-font="mono"] { --font-body: var(--font-mono), ui-monospace, "SF Mono", Menlo, monospace; }
+
+:root[data-spacing="roomy"] {
+  --line-height: 2;
+  --letter-spacing: 0.02em;
+  --word-spacing: 0.12em;
+  --measure: 58ch;
+}
+
+html {
+  font-size: calc(100% * var(--font-scale));
+  -webkit-text-size-adjust: 100%;
+}
+
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body, var(--font-inter), ui-sans-serif, system-ui, sans-serif);
+  line-height: var(--line-height);
+  letter-spacing: var(--letter-spacing);
+  word-spacing: var(--word-spacing);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* Motion is opt-in, and off unless the OS says otherwise. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+:root[data-motion="none"] *,
+:root[data-motion="none"] *::before,
+:root[data-motion="none"] *::after {
+  animation-duration: 0.001ms !important;
+  transition-duration: 0.001ms !important;
+  scroll-behavior: auto !important;
+}
+
+/* Focus must always be obvious. Never remove this. */
+:where(a, button, input, textarea, select, summary, [tabindex]):focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+::selection { background: var(--accent-soft); color: var(--text); }
+
+.skip-link {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  background: var(--surface);
+  color: var(--text);
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--focus);
+  z-index: 100;
+  border-radius: 0 0 var(--radius) 0;
+}
+.skip-link:focus { left: 0; }
+
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.measure { max-width: var(--measure); }
+
+/* Severity is never communicated by colour alone — every badge carries a word. */
+.sev-blocker { color: var(--blocker); background: var(--blocker-soft); }
+.sev-friction { color: var(--friction); background: var(--friction-soft); }
+.sev-note { color: var(--note); background: var(--note-soft); }
+
+textarea, input, select {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+textarea::placeholder, input::placeholder { color: var(--text-muted); opacity: 1; }
+
+.btn {
+  border-radius: var(--radius);
+  border: 1px solid transparent;
+  font-weight: 600;
+  transition: background-color 120ms ease, border-color 120ms ease;
+}
+.btn-primary { background: var(--accent); color: #fff; }
+:root[data-theme="dark"] .btn-primary,
+:root[data-contrast="high"][data-theme="dark"] .btn-primary { color: #10241e; }
+.btn-primary:hover:not(:disabled) { filter: brightness(1.08); }
+.btn-primary:disabled { opacity: 0.55; cursor: not-allowed; }
+.btn-quiet { background: var(--surface); color: var(--text); border-color: var(--border); }
+.btn-quiet:hover { background: var(--surface-2); }
+.btn-quiet[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); }
+
+@media print {
+  .no-print { display: none !important; }
+  body { background: #fff; color: #000; }
 }
