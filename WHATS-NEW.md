@@ -179,9 +179,40 @@ Fixed.
 
 Two bugs now found by testing claims rather than trusting them. Worth remembering.
 
+## ✅ Design, walkthrough and compliance audit
+
+**On animations / 3D — I pushed back, and here's why.** Usability & accessibility is
+**25%** of the score and sensory load is a documented barrier for this audience. A
+tool that offers a "reduce motion" setting while animating its own landing page is
+not taking its own advice, and Stanford NNEA judges would spot that first.
+
+But you were right that it read as unfinished. So the effort went where it costs
+nothing to read:
+- **A static hero figure** — a brief with the vague parts marked, and the questions
+  that come back. Someone who reads none of the copy still understands the product.
+  It reuses the severity palette, so colours mean the same thing on the landing page
+  as in a result.
+- Deleted the five stock Next.js SVGs still sitting in `public/`.
+- **`/judges`** — a three-minute walkthrough with a "why it looks this calm" section.
+  Restraint that's explained reads as a decision; restraint that isn't reads as an
+  omission.
+
+**`COMPLIANCE.md`** holds the whole thing against the rules and rubric, including a
+blunt "where this could lose" section.
+
+## ⚠️ The competition, from Discord
+
+- **Rehearse** (osasgentech, Track 2) — live at rehearse.duckdns.org. A voice agent
+  roleplaying conversations to practise. **This is the idea I talked you out of.**
+  Note their safety layer: say "stop" and it drops the roleplay instantly — they're
+  handling the masking risk directly. Not our track, and our reasoning holds.
+- **H_L** (Track 1) — ADHD task initiation, and they're an **NYU UI/UX designer with
+  research experience**. Strongest competitor in your track. But they're building the
+  thing four other visible projects are also building; you aren't.
+
 ## Not built yet
 
-- **Demo video** — Saturday, with you
+- **Demo video** — the script in SUBMISSION.md is ready to follow
 - Anything you want changed after reading this
 
 ---
@@ -239,3 +270,7 @@ display. 56 tests pass, five pages live at HTTP 200, production API confirmed he
 
 **Everything I can do without you is done.** Waiting on: your review, a Discord tester
 if one replied, and the demo video.
+
+**07 Aug, ~07:30** — Static hero figure, `/judges` walkthrough, stock assets removed,
+`COMPLIANCE.md` audit against rules and rubric. Six pages live at HTTP 200, 56 tests
+passing. Pushed back on animation/3D — reasoning in the design section above.

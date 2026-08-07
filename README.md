@@ -97,7 +97,10 @@ is a fact about the *project* — decisions not yet confirmed, questions open fi
 days or more, parts of the work with no owner. No participation score, no
 per-student count, no judgement about any person.
 
-### Also: `/checks`
+### Also: `/judges` and `/checks`
+`/judges` is a three-minute guided walkthrough — what to click, in what order, and
+what each part is trying to prove.
+
 Every check, listed straight from the array the engine runs, so the tool can be
 read without cloning it.
 
