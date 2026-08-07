@@ -35,6 +35,11 @@ export async function POST(req: NextRequest) {
     const { result, error } = await interpret(brief);
     interpretation = result ?? undefined;
     if (error) aiError = error;
+  } else {
+    // Say so explicitly. Without this the UI has no way to distinguish "no key
+    // configured" from "the AI ran and found nothing", and silently shows neither
+    // an interpretation nor a reason — which reads like something broke.
+    aiError = "no-provider";
   }
 
   const result: DecodeResult = {
