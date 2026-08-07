@@ -165,6 +165,20 @@ pathological inputs (empty, unicode, regex metacharacters, HTML, a 60k-word brie
 One test enforces a product rule directly: **no finding may ever contain clinical
 or diagnostic language.** Good number to quote in the submission.
 
+## ✅ Verified the no-key claim — and it found one more bug
+
+I'd written in the README *and* the submission draft that the app works with no API
+key. I'd never actually run it that way. **It does** — 18 checks, 23 findings, page
+renders fine.
+
+But testing the claim instead of asserting it found a gap: with no provider
+configured the UI showed no interpretation *and no reason why*, because the "no AI
+provider is configured" message could never fire. To a judge cloning the repo
+without keys, that reads like something is broken rather than a deliberate design.
+Fixed.
+
+Two bugs now found by testing claims rather than trusting them. Worth remembering.
+
 ## Not built yet
 
 - **Demo video** — Saturday, with you
@@ -218,3 +232,10 @@ returning 18 checks and workstreams.
 **07 Aug, ~04:45** — Added a 56-test suite (vitest). It immediately caught a false
 positive in the checkpoint check and I fixed the check. All five pages still live at
 HTTP 200. README documents the testing approach.
+
+**07 Aug, ~05:45** — Verified the app genuinely runs with no API key (it does), and
+fixed the resulting bug where the "no provider configured" explanation could never
+display. 56 tests pass, five pages live at HTTP 200, production API confirmed healthy.
+
+**Everything I can do without you is done.** Waiting on: your review, a Discord tester
+if one replied, and the demo video.
