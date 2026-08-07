@@ -4,6 +4,7 @@ import { useState, useRef } from "react";
 import type { DecodeResult } from "@/lib/types";
 import { Results } from "@/components/Results";
 import { SAMPLE_BRIEF } from "@/lib/sample";
+import { HeroFigure } from "@/components/HeroFigure";
 
 export default function Home() {
   const [brief, setBrief] = useState("");
@@ -54,6 +55,15 @@ export default function Home() {
           <p style={{ color: "var(--text-muted)" }}>
             Paste a brief. Get back the specific questions worth asking — in words you can send
             straight to a teacher.
+          </p>
+        </section>
+      )}
+
+      {!result && (
+        <section aria-label="How it works" className="-mx-1">
+          <HeroFigure />
+          <p className="text-sm text-center measure mx-auto" style={{ color: "var(--text-muted)" }}>
+            The vague parts of a brief, turned into questions you can actually ask.
           </p>
         </section>
       )}

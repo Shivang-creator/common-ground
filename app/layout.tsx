@@ -65,6 +65,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                   <a href="/checks" className="underline-offset-4 hover:underline" style={{ color: "var(--text-muted)" }}>
                     Checks
                   </a>
+                  <a href="/judges" className="underline-offset-4 hover:underline" style={{ color: "var(--text-muted)" }}>
+                    Walkthrough
+                  </a>
                 </nav>
               </div>
               <DisplaySettings />
