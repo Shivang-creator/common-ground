@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { CATEGORY_META, type CheckCategory, type DecodeResult, type Finding } from "@/lib/types";
+import { ResultSummary } from "@/components/ResultSummary";
 
 const SEV_LABEL: Record<Finding["severity"], string> = {
   blocker: "Blocks starting",
@@ -62,37 +63,32 @@ export function Results({ result }: { result: DecodeResult }) {
 
   return (
     <div className="space-y-8">
-      {/* Summary line — plain, no score, no grade, no judgement of the student. */}
-      <section aria-labelledby="summary-h" className="card p-5 sm:p-6">
-        <h2 id="summary-h" className="text-xl font-semibold mb-3">
+      {/* Visual first, prose second. Someone already overwhelmed does not want a
+          paragraph about how overwhelming their brief is. */}
+      <section aria-labelledby="summary-h" className="space-y-4">
+        <h2 id="summary-h" className="text-2xl font-semibold">
           What this brief leaves unsaid
         </h2>
-        <p className="measure" style={{ color: "var(--text-muted)" }}>
-          {findings.length === 0 ? (
-            <>This brief is unusually complete. Nothing came up worth asking about.</>
-          ) : (
-            <>
-              {counts.blocker > 0 && (
-                <>
-                  <strong style={{ color: "var(--text)" }}>{counts.blocker}</strong>{" "}
-                  {counts.blocker === 1 ? "thing" : "things"} you&rsquo;d need before you could
-                  confidently start
-                  {counts.friction + counts.note > 0 ? ", and " : ". "}
-                </>
-              )}
-              {counts.friction + counts.note > 0 && (
-                <>
-                  <strong style={{ color: "var(--text)" }}>{counts.friction + counts.note}</strong>{" "}
-                  more that would save time later.{" "}
-                </>
-              )}
-              None of this is a gap in you. It&rsquo;s a gap in the brief, and every one of them is
-              a fair question to ask.
-            </>
-          )}
-        </p>
+
+        {findings.length === 0 ? (
+          <p className="measure" style={{ color: "var(--text-muted)" }}>
+            This brief is unusually complete. Nothing came up worth asking about.
+          </p>
+        ) : (
+          <>
+            <ResultSummary findings={findings} />
+            <p
+              className="measure text-lg font-medium"
+              style={{ color: "var(--text)" }}
+            >
+              None of this is a gap in you. It&rsquo;s a gap in the brief — and every one of
+              them is a fair question to ask.
+            </p>
+          </>
+        )}
+
         {interpretation?.summary && (
-          <p className="measure mt-4 pt-4 border-t" style={{ borderColor: "var(--border)" }}>
+          <p className="measure card p-4">
             <span className="font-semibold">In one sentence: </span>
             {interpretation.summary}
           </p>

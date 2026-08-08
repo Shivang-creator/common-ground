@@ -7,7 +7,7 @@ import { SAMPLE_BRIEF } from "@/lib/sample";
 import { HeroFigure } from "@/components/HeroFigure";
 
 export default function Home() {
-  const [brief, setBrief] = useState("");
+  const [brief, setBrief] = useState(SAMPLE_BRIEF);
   const [result, setResult] = useState<DecodeResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -42,47 +42,48 @@ export default function Home() {
   return (
     <div className="space-y-10">
       {!result && (
-        <section className="measure space-y-4">
-          <h1 className="text-3xl sm:text-4xl font-semibold tracking-tight text-balance">
+        <section className="space-y-5">
+          <h1 className="text-3xl sm:text-5xl font-semibold tracking-tight text-balance measure">
             Make the unwritten rules written.
           </h1>
-          <p className="text-lg" style={{ color: "var(--text-muted)" }}>
-            Most assignment briefs leave things out — how long it should be, what
-            &ldquo;discuss&rdquo; means here, who does what in the group, what the marks are
-            actually for. Some people fill those gaps by reading the room. Everyone else pays for
-            them in time and stress.
+          <p className="text-lg sm:text-xl measure" style={{ color: "var(--text-muted)" }}>
+            Assignment briefs leave things out. Some people fill the gaps by reading the room.
+            Everyone else pays for them.
           </p>
-          <p style={{ color: "var(--text-muted)" }}>
-            Paste a brief. Get back the specific questions worth asking — in words you can send
-            straight to a teacher.
-          </p>
-        </section>
-      )}
 
-      {!result && (
-        <section aria-label="How it works" className="-mx-1">
           <HeroFigure />
-          <p className="text-sm text-center measure mx-auto" style={{ color: "var(--text-muted)" }}>
-            The vague parts of a brief, turned into questions you can actually ask.
-          </p>
+
+          <div className="flex flex-wrap items-center gap-3">
+            <button
+              type="button"
+              className="btn btn-primary px-6 py-3 text-lg"
+              disabled={loading}
+              onClick={() => decode(brief)}
+            >
+              {loading ? "Reading the brief…" : "Try it on this example →"}
+            </button>
+            <span className="text-sm" style={{ color: "var(--text-muted)" }}>
+              Already loaded. No signup, nothing to install.
+            </span>
+          </div>
         </section>
       )}
 
       <section aria-labelledby="paste-h" className="space-y-3 no-print">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <label htmlFor="brief" id="paste-h" className="text-lg font-semibold">
-            Paste the assignment brief
+            {result ? "The brief" : "…or paste your own"}
           </label>
           <button
             type="button"
             className="btn btn-quiet px-3 py-1.5 text-sm"
             onClick={() => {
-              setBrief(SAMPLE_BRIEF);
+              setBrief("");
               setResult(null);
               setError(null);
             }}
           >
-            Use an example
+            Clear
           </button>
         </div>
 
@@ -90,7 +91,7 @@ export default function Home() {
           id="brief"
           value={brief}
           onChange={(e) => setBrief(e.target.value)}
-          rows={10}
+          rows={7}
           spellCheck={false}
           placeholder="Paste the whole thing — every sentence the teacher wrote. The more it says, the more can be checked."
           aria-describedby="brief-help"
