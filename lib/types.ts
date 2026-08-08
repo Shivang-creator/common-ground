@@ -26,8 +26,10 @@ export interface Finding {
   severity: Severity;
   /** Short human title, plain language, no jargon. */
   title: string;
-  /** The exact text from the brief that triggered this, if any. */
+  /** The whole sentence from the brief that triggered this, if any. */
   excerpt?: string;
+  /** The exact phrase within that sentence, so the UI can mark it. */
+  match?: string;
   /** Why this matters — plain language, no clinical framing. */
   why: string;
   /**

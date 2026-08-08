@@ -20,10 +20,37 @@ import type { Check, Finding } from "./types";
 
 /* ── helpers ─────────────────────────────────────────────────────────────── */
 
-const sentenceAround = (text: string, index: number, span = 90): string => {
-  const start = Math.max(0, index - span);
-  const end = Math.min(text.length, index + span);
-  return (start > 0 ? "…" : "") + text.slice(start, end).trim().replace(/\s+/g, " ") + (end < text.length ? "…" : "");
+/**
+ * The whole sentence the match sits in, not a slice of characters around it.
+ *
+ * A dyslexic tester: *"The quote fragments are the hardest thing on the page —
+ * ellipses mid-sentence with no punctuation to anchor on. Give me the whole
+ * sentence with the phrase bolded instead of a truncated ribbon."*
+ *
+ * So this walks out to real sentence boundaries. A sentence long enough to be its
+ * own problem still gets trimmed, but always at a word, and only then.
+ */
+const sentenceAround = (text: string, index: number): string => {
+  const before = text.slice(0, index);
+  const after = text.slice(index);
+
+  let start = Math.max(
+    before.lastIndexOf(". "), before.lastIndexOf("! "), before.lastIndexOf("? "),
+    before.lastIndexOf("\n"),
+  );
+  start = start === -1 ? 0 : start + 1;
+
+  const endRel = after.search(/[.!?](\s|$)/);
+  const end = endRel === -1 ? text.length : index + endRel + 1;
+
+  let sentence = text.slice(start, end).trim().replace(/\s+/g, " ");
+
+  // Only trim if it is genuinely unreadable, and never mid-word.
+  if (sentence.length > 260) {
+    const cut = sentence.slice(0, 260);
+    sentence = cut.slice(0, cut.lastIndexOf(" ")) + " …";
+  }
+  return sentence;
 };
 
 /** Find whole-word matches for any phrase in `terms`. Case-insensitive. */
@@ -200,6 +227,7 @@ export const CHECKS: Check[] = [
               ? `"${terms[0]}" can mean more than one thing`
               : `${terms.length} instruction words that mean different things to different markers`,
           excerpt: hits[0].excerpt,
+          match: hits[0].term,
           why:
             (VERBS[terms[0]] ?? "Markers read this instruction word differently.") +
             (terms.length > 1
@@ -262,7 +290,7 @@ export const CHECKS: Check[] = [
         category: "quantity" as const,
         severity: "note" as const,
         title: `"${term}" — how many is that?`,
-        excerpt,
+        excerpt, match: term,
         why: "Amounts like this are obvious to whoever wrote the brief and genuinely ambiguous to everyone reading it. Guessing low loses marks; guessing high loses time.",
         question: `The brief says "${term}" — is there a rough number or minimum you have in mind?`,
       }));
@@ -272,7 +300,7 @@ export const CHECKS: Check[] = [
         category: "quantity" as const,
         severity: "note" as const,
         title: `"${term}" — measured against what?`,
-        excerpt,
+        excerpt, match: term,
         why: "This is a standard rather than an amount, and the standard is assumed rather than stated. Whoever wrote it has something specific in mind.",
         question: `What would make something "${term}" for this assignment — is there an example of one that hit the mark?`,
       }));
@@ -298,7 +326,7 @@ export const CHECKS: Check[] = [
         category: "assumed" as const,
         severity: "friction" as const,
         title: `"${term}" assumes you already know something`,
-        excerpt,
+        excerpt, match: term,
         why: "Phrases like this point at knowledge that was never written down — often mentioned once in a class, or simply expected. It is not a gap in you; it is a gap in the brief.",
         question: `The brief says "${term}" here — could you spell out what's being assumed? I'd rather check than guess.`,
       }));
@@ -431,7 +459,7 @@ export const CHECKS: Check[] = [
         category: "instruction" as const,
         severity: "friction" as const,
         title: `"${term}" — required, or genuinely optional?`,
-        excerpt,
+        excerpt, match: term,
         why: "Politely-worded instructions are one of the most common places marks are quietly lost. Some markers write suggestions this way; others write requirements this way. Read literally, it is optional. Read as most people mean it, it is not.",
         question: `The brief says "${term}" here — is that something we have to do, or genuinely up to us?`,
       }));
@@ -463,7 +491,7 @@ export const CHECKS: Check[] = [
         category: "assumed" as const,
         severity: "note" as const,
         title: `"${a}" is never spelled out`,
-        excerpt,
+        excerpt, match: a,
         why: "Course shorthand is invisible to whoever wrote it and opaque to anyone who missed the class where it was introduced. Asking is not a sign you are behind.",
         question: `What does "${a}" stand for in this context?`,
       }));

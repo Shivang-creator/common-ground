@@ -17,6 +17,64 @@ const SEV_LABEL: Record<Finding["severity"], string> = {
   note: "Worth checking",
 };
 
+/**
+ * The brief's own sentence, with the phrase that triggered the finding marked.
+ *
+ * A dyslexic tester found the old truncated ribbons the hardest thing on the page —
+ * "ellipses mid-sentence with no punctuation to anchor on". A whole sentence gives
+ * you the anchors; the mark tells you where to look without removing the context.
+ *
+ * Never colour alone: the phrase is bold and underlined too.
+ */
+function Marked({ sentence, phrase }: { sentence: string; phrase?: string }) {
+  if (!phrase) return <>{sentence}</>;
+  const i = sentence.toLowerCase().indexOf(phrase.toLowerCase());
+  if (i === -1) return <>{sentence}</>;
+  return (
+    <>
+      {sentence.slice(0, i)}
+      <strong
+        className="underline underline-offset-2 decoration-2"
+        style={{ color: "var(--text)" }}
+      >
+        {sentence.slice(i, i + phrase.length)}
+      </strong>
+      {sentence.slice(i + phrase.length)}
+    </>
+  );
+}
+
+/**
+ * A distinct shape per category.
+ *
+ * A dyslexic tester: *"Seven category headings that are all the same grey small-caps
+ * means I navigate by reading, which is exactly the thing I'm slow at. A distinct
+ * shape or icon per category would let me find 'how it's marked' without reading."*
+ *
+ * Shapes, not colours, and every one keeps its text label — the icon is a landmark,
+ * never the only carrier of meaning.
+ */
+function CategoryMark({ category }: { category: CheckCategory }) {
+  const common = { width: 22, height: 22, "aria-hidden": true as const, className: "shrink-0" };
+  const stroke = { stroke: "var(--accent)", strokeWidth: 2, fill: "none", strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
+  switch (category) {
+    case "finish-line": // chequered flag
+      return <svg {...common} viewBox="0 0 24 24"><path d="M5 21V4" {...stroke} /><path d="M5 5h14l-3 4 3 4H5" {...stroke} /></svg>;
+    case "instruction": // speech mark
+      return <svg {...common} viewBox="0 0 24 24"><path d="M20 6H4v10h4l3 3v-3h9z" {...stroke} /></svg>;
+    case "assessment": // tick in a circle
+      return <svg {...common} viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.5" {...stroke} /><path d="M8.5 12.5l2.5 2.5 4.5-5" {...stroke} /></svg>;
+    case "quantity": // ruler
+      return <svg {...common} viewBox="0 0 24 24"><rect x="3" y="8" width="18" height="8" rx="1.5" {...stroke} /><path d="M8 8v3M12 8v4M16 8v3" {...stroke} /></svg>;
+    case "assumed": // key
+      return <svg {...common} viewBox="0 0 24 24"><circle cx="8" cy="12" r="3.5" {...stroke} /><path d="M11.5 12H21M18 12v3M15 12v2" {...stroke} /></svg>;
+    case "group": // two people
+      return <svg {...common} viewBox="0 0 24 24"><circle cx="9" cy="9" r="3" {...stroke} /><circle cx="17" cy="10" r="2.4" {...stroke} /><path d="M3.5 19c0-3 2.5-5 5.5-5s5.5 2 5.5 5M17 14.5c2 0 3.5 1.6 3.5 3.6" {...stroke} /></svg>;
+    case "process": // calendar
+      return <svg {...common} viewBox="0 0 24 24"><rect x="3.5" y="5" width="17" height="15" rx="2" {...stroke} /><path d="M3.5 10h17M8 3v4M16 3v4" {...stroke} /></svg>;
+  }
+}
+
 function Badge({ severity }: { severity: Finding["severity"] }) {
   return (
     <span className={`sev-${severity} text-xs font-semibold px-2 py-0.5 rounded-full whitespace-nowrap`}>
@@ -282,7 +340,8 @@ export function Results({ result, brief }: { result: DecodeResult; brief: string
               const meta = CATEGORY_META[cat];
               return (
                 <div key={cat}>
-                  <h3 className="text-sm font-semibold uppercase tracking-wide mb-1" style={{ color: "var(--text-muted)" }}>
+                  <h3 className="text-base font-semibold mb-1 flex items-center gap-2">
+                    <CategoryMark category={cat} />
                     {meta.label}
                   </h3>
                   <p className="text-sm mb-3" style={{ color: "var(--text-muted)" }}>
@@ -335,7 +394,7 @@ export function Results({ result, brief }: { result: DecodeResult; brief: string
                                 className="text-sm mb-1 pl-3 border-l-2"
                                 style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}
                               >
-                                {f.excerpt}
+                                <Marked sentence={f.excerpt} phrase={f.match} />
                               </blockquote>
                             )}
                           </div>
@@ -346,6 +405,31 @@ export function Results({ result, brief }: { result: DecodeResult; brief: string
                 </div>
               );
             })}
+          </div>
+        </section>
+      )}
+
+      {findings.length > 0 && (
+        <section aria-labelledby="after-h" className="card p-5">
+          <h2 id="after-h" className="font-semibold mb-2">
+            After you send it
+          </h2>
+          <div className="space-y-2 text-sm measure" style={{ color: "var(--text-muted)" }}>
+            <p>
+              Most tutors reply within two or three working days. Sending questions in
+              writing before a deadline is a normal thing to do and does not count against
+              you — it is the same information you would get by catching someone after class,
+              in a form you can keep.
+            </p>
+            <p>
+              If nobody answers in about three working days, it is reasonable to send the same
+              message once more, or ask a course administrator who else could answer. Not
+              replying usually means it got buried, not that the question was wrong.
+            </p>
+            <p>
+              When an answer comes back, write it in above. It leaves your email — and your
+              group&rsquo;s.
+            </p>
           </div>
         </section>
       )}
