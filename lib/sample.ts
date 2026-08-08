@@ -17,6 +17,9 @@ Your group should consider the social, economic and environmental dimensions of
 the issue you choose. Discuss the trade-offs involved and reflect on what a
 realistic intervention might look like in practice.
 
+Your report should be 3000 words across four sections. Marks: analysis is 40%,
+use of evidence 30%, structure 20% and presentation 10%.
+
 Please use appropriate sources to support your argument. As discussed in the
 seminar, make sure your work follows the usual format.
 

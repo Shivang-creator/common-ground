@@ -5,6 +5,7 @@ import { CATEGORY_META, type CheckCategory, type DecodeResult, type Finding, typ
 import { ResultSummary } from "@/components/ResultSummary";
 import { ReadAloud } from "@/components/ReadAloud";
 import { AnswerBox } from "@/components/AnswerBox";
+import { Arithmetic } from "@/components/Arithmetic";
 import {
   loadAnswers, saveAnswer, removeAnswer, questionKey, shareLink,
   type Answer,
@@ -129,6 +130,8 @@ export function Results({ result, brief }: { result: DecodeResult; brief: string
           </p>
         )}
       </section>
+
+      <Arithmetic brief={brief} />
 
       {/* Definition of done */}
       {(interpretation?.definitionOfDone?.length || interpretation?.deliverables?.length) && (

@@ -56,6 +56,12 @@ describe("crying wolf", () => {
     expect(ids.has("process.no-late-policy")).toBe(false);
   });
 
+  it("treats a list of percentage weightings as marking criteria", () => {
+    // A brief can give a full marking breakdown without ever saying "criteria".
+    const brief = "Write a 1500 word report. Analysis 40%, evidence 40%, structure 20%.";
+    expect(runChecks(brief).findings.map((f) => f.id)).not.toContain("assessment.no-criteria");
+  });
+
   it("does not raise group findings on an individual assignment", () => {
     const findings = runChecks(COMPLETE_BRIEF).findings;
     expect(findings.filter((f) => f.category === "group")).toHaveLength(0);
@@ -67,13 +73,10 @@ describe("finding the gaps that are actually there", () => {
   const ids = findings.map((f) => f.id);
 
   it("flags the blockers in the example brief", () => {
-    for (const id of [
-      "finish-line.no-length",
-      "finish-line.no-format",
-      "assessment.no-criteria",
-      "group.no-roles",
-      "group.individual-vs-group-mark",
-    ]) {
+    // The example brief now states a word count, a format and a marking split, so
+    // those checks correctly stay silent. What remains is what it genuinely omits:
+    // who does what, and whether the mark is shared.
+    for (const id of ["group.no-roles", "group.individual-vs-group-mark"]) {
       expect(ids, `expected ${id}`).toContain(id);
     }
   });

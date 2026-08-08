@@ -220,8 +220,11 @@ export const CHECKS: Check[] = [
     category: "assessment",
     describes: "No marking criteria, rubric or weighting mentioned.",
     run: (brief) => {
+      // Two or more percentage weightings IS a marking breakdown, whatever it is called.
+      if ((brief.match(/\b\d{1,3}\s*%/g) ?? []).length >= 2) return [];
       const hasCriteria = has(brief, [
         "criteria", "criterion", "rubric", "marking", "marked on", "assessed on", "grading",
+        "marks", "mark scheme", "weighting",
         "weighting", "weighted", "marks? for", "graded on", "learning outcomes?",
       ]);
       if (hasCriteria) return [];
