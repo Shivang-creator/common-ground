@@ -134,17 +134,72 @@ On the typeface option: evidence for specialised "dyslexia fonts" is genuinely
 mixed, so the UI says *"pick whichever is easier for you to read. There is no
 correct answer."* A preference, not a remedy.
 
-### ⚠️ How neurodivergent users shaped this — FILL THIS IN
+### How a neurodivergent user shaped this
 
-**If someone replied on Discord:** name them (or note they chose anonymity), what
-you asked, what they said, and — most important — **one concrete thing you changed
-because of it.** One documented change beats five vague claims.
+I asked publicly in the IncludEDU Discord and a neurodivergent tester agreed to try
+it on 8 August, the day before the deadline. They used it on a real coursework brief
+of their own, not the example, and sent back written and recorded feedback.
 
-**If nobody replied:** say so plainly, note that you asked publicly in the
-IncludEDU Discord on 7 August (screenshot it), and point to the design rationale
-table below. The organiser explicitly sanctioned this route: *"Base your design on
-published research, interviews, or first-person accounts from neurodivergent
-creators (cite your sources in your submission)."*
+**It found four things. Three of them were wrong.** Their brief said, verbatim,
+*"Extensions follow the standard university policy"* — and the tool told them their
+brief had no extensions policy.
+
+> *"Sending my tutor a question they already answered in writing is precisely the
+> humiliation this tool exists to prevent."*
+
+That sentence reframed the whole project for me. I had been treating a false
+positive as a minor accuracy bug. For the person using it, it is the exact failure
+the product exists to prevent — it hands you a confident question that makes you
+look like you didn't read.
+
+**Everything below shipped before the deadline, and each fix is pinned by a
+regression test in `tests/tester-feedback.test.ts`.**
+
+| They said | So I changed |
+|---|---|
+| *"Extensions follow the standard university policy" → returned "Nothing about extensions or lateness."* | The word matcher demanded an exact boundary, so **"Extensions" never matched "extension."** Plurals and inflections now match. |
+| *"If your group runs into difficulties, email me" → returned "No route if the group runs into trouble."* | The term list had "dispute" and "conflict" but not the words briefs actually use. Added "difficulties", "email me", "module admin", "get in touch". |
+| *"Module code PH2032 → returned 'PH' is never spelled out."* | The acronym pattern excluded adjacent letters but not digits. |
+| — *(their brief was titled "Individual report" and still got group findings)* | Group checks now require an actual instruction to work in groups; an explicit individual framing overrides. |
+| *"'Relevant literature' is not a quantity. If I send that, I look like I can't read English. Your whole pitch is asking this won't make you look stupid — and these are the ones that would."* | Split into two checks. **Amounts** get asked for a number; **standards** get asked what the standard is. |
+| *"I pressed Copy all questions — the output is seven copies of the same question with one word swapped. Nobody sends that email. Your flagship action produces an unsendable artifact."* | Seven instruction verbs collapse into **one** finding naming them all, and Copy now writes **an actual email** containing only what is on screen. |
+| *"'Done. 23 things worth asking about.' That's not relief, that's a new task with 23 subtasks."* | The three counts are **filters**, and the page opens showing only what blocks starting. |
+| *"Below ~624px the header sets a hard floor, so the whole page slides sideways and the Display button sits off the right edge."* | Header wraps. This was breaking the exact control the walkthrough points at. |
+| *"'Every finding quotes the exact words' — not true. 11 of 23 have no quote."* | It was false: absence-checks have nothing to quote. **Claim reworded** rather than the behaviour faked. |
+| *"Same brief, two runs: 4 workstreams once and 2 the other time. Two people run it, get different structures, and now there's something to argue about — in the tool built to remove the argument."* | temperature 0 with a fixed seed, and the prompt now forbids organisational steps as workstreams. |
+| *"Being told I'm not the problem, unprompted, repeatedly, implies somebody expected me to think I was."* | The reassurance appeared in the headline **and** in every card. Now once, quietly. |
+| *"'The student it was designed for is the last one anybody would guess' is aimed at a judge, not at me. It sounds proud of how well it hides me."* | Cut, everywhere it appeared. |
+
+**Result: their brief now returns zero findings.** It is a well-written brief and
+the tool finally agrees.
+
+**Two things they told me that changed what the product *is*, not just how it works:**
+
+**1. I had the mechanism wrong.** I had written that some students "fill the gaps by
+reading the room."
+
+> *"The people who 'seem to know' mostly don't know either — they asked each other.
+> It travels through group chats. So the barrier is as much social capital as brief
+> quality."*
+
+That is a better description than the one in my research, and the landing page now
+says it.
+
+**2. They found a gap I had not seen, and solved it.** The design removes the need to
+disclose — but not the need to be conspicuous:
+
+> *"This only works if the whole class uses it. If it's just me pasting the brief and
+> turning up with 23 questions, I'm now visibly the person who Has A System — which
+> is its own kind of marked. You've solved disclosure but not conspicuousness. The
+> version that closes it is aimed at whoever writes the brief: run it on your own
+> assignment before you publish it. Same engine, same output, and then nobody in the
+> class has to be the one who asked."*
+
+That is now on the front page. It is their idea, not mine.
+
+They also asked for one thing I want to state plainly, because the objection will
+come: this removes one barrier, and **it is not a reason for anyone to have fewer
+formal accommodations.** The site says so.
 
 ---
 
