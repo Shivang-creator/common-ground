@@ -23,5 +23,5 @@ use of evidence 30%, structure 20% and presentation 10%.
 Please use appropriate sources to support your argument. As discussed in the
 seminar, make sure your work follows the usual format.
 
-Groups should organise themselves and get started as soon as possible. Come and
-see me if you have questions.`;
+Submit by 14 December. Groups should organise themselves and get started as soon
+as possible. Come and see me if you have questions.`;

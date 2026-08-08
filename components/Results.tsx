@@ -6,6 +6,7 @@ import { ResultSummary } from "@/components/ResultSummary";
 import { ReadAloud } from "@/components/ReadAloud";
 import { AnswerBox } from "@/components/AnswerBox";
 import { Arithmetic } from "@/components/Arithmetic";
+import { Timeline } from "@/components/Timeline";
 import {
   loadAnswers, saveAnswer, removeAnswer, questionKey, shareLink,
   type Answer,
@@ -188,6 +189,8 @@ export function Results({ result, brief }: { result: DecodeResult; brief: string
           </p>
         )}
       </section>
+
+      <Timeline brief={brief} />
 
       <Arithmetic brief={brief} />
 
