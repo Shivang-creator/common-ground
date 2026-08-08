@@ -41,11 +41,43 @@ function findTerms(brief: string, terms: string[]): { term: string; excerpt: str
   return out;
 }
 
+/**
+ * Whole-word match, tolerant of plurals and simple inflections.
+ *
+ * The original version required an exact word boundary immediately after the
+ * term, so a brief saying "Extensions follow the standard university policy"
+ * did not match "extension" and was told it had no extensions policy. A tester
+ * hit exactly that. Telling someone their brief is missing something it plainly
+ * states is the worst failure this tool has, so matching now allows a trailing
+ * s / es / ed / ing.
+ */
 const has = (brief: string, terms: string[]): boolean =>
-  terms.some((t) => new RegExp(`(?<![\\w-])${t}(?![\\w-])`, "i").test(brief));
+  terms.some((t) => new RegExp(`(?<![\\w-])${t}(?:s|es|ed|ing)?(?![\\w-])`, "i").test(brief));
 
-const mentionsGroup = (brief: string) =>
-  has(brief, ["group", "groups", "team", "teams", "pair", "pairs", "partner", "collaborat\\w*", "together", "peer"]);
+/**
+ * Is this actually group work?
+ *
+ * Merely containing the word "group" is not enough. A tester's brief was titled
+ * "Individual report" and mentioned a group only once, in passing — "if your group
+ * runs into difficulties, email me" — and got told it needed role guidance and a
+ * marking split. Both are nonsense for an individual assignment.
+ *
+ * So: an explicit individual framing wins outright, and otherwise the brief has to
+ * actually instruct group work rather than mention the word.
+ */
+const mentionsGroup = (brief: string): boolean => {
+  if (/\bindividual(ly)?\b/i.test(brief) && !/\bgroup work\b/i.test(brief)) return false;
+
+  const instructsGroupWork =
+    /\b(in|as|into)\s+(a\s+)?(groups?|teams?|pairs?)\b/i.test(brief) ||
+    /\bgroups?\s+of\s+\w+/i.test(brief) ||
+    /\byour\s+(group|team)\s+(should|must|will|needs?)\b/i.test(brief) ||
+    /\b(group|team)\s+(project|work|assignment|presentation|report|submission)\b/i.test(brief) ||
+    /\bwork\s+(together|collaborativel\w+)\b/i.test(brief) ||
+    /\bcollaborat\w+\b/i.test(brief);
+
+  return instructsGroupWork;
+};
 
 /* ── the checks ──────────────────────────────────────────────────────────── */
 
@@ -143,15 +175,42 @@ export const CHECKS: Check[] = [
         problematise: "Assumes you already know what is taken for granted here.",
       };
       const hits = findTerms(brief, Object.keys(VERBS));
-      return hits.map(({ term, excerpt }) => ({
-        id: "instruction.vague-verb",
-        category: "instruction" as const,
-        severity: "friction" as const,
-        title: `"${term}" can mean more than one thing`,
-        excerpt,
-        why: VERBS[term.toLowerCase()] ?? "This instruction word is read differently by different markers.",
-        question: `When the brief says "${term}", what does that look like in an answer that gets full marks?`,
-      }));
+      if (!hits.length) return [];
+
+      // One finding, not one per verb.
+      //
+      // A tester pressed "Copy all questions" on a brief with seven instruction
+      // verbs and got seven copies of the same sentence with one word swapped.
+      // Nobody sends that email — and Copy-all is the flagship action. So these
+      // collapse into a single finding that names every verb once and asks one
+      // answerable question.
+      const terms = hits.map((h) => h.term.toLowerCase());
+      const list =
+        terms.length === 1
+          ? `"${terms[0]}"`
+          : terms.slice(0, -1).map((t) => `"${t}"`).join(", ") + ` and "${terms[terms.length - 1]}"`;
+
+      return [
+        {
+          id: "instruction.vague-verb",
+          category: "instruction" as const,
+          severity: "friction" as const,
+          title:
+            terms.length === 1
+              ? `"${terms[0]}" can mean more than one thing`
+              : `${terms.length} instruction words that mean different things to different markers`,
+          excerpt: hits[0].excerpt,
+          why:
+            (VERBS[terms[0]] ?? "Markers read this instruction word differently.") +
+            (terms.length > 1
+              ? ` The same is true of the others here — each one is read differently by different markers, and the brief does not say which reading it wants.`
+              : ""),
+          question:
+            terms.length === 1
+              ? `When the brief says "${terms[0]}", what does that look like in an answer that gets full marks?`
+              : `The brief uses ${list}. Could you say what one or two of those look like in practice for this assignment — I want to make sure I'm answering what you're actually asking for.`,
+        },
+      ];
     },
   },
 
@@ -185,21 +244,37 @@ export const CHECKS: Check[] = [
     category: "quantity",
     describes: "Amounts left as a judgement call — 'some', 'several', 'appropriate'.",
     run: (brief) => {
-      const TERMS = [
-        "some", "several", "a few", "a range of", "a variety of", "multiple", "various",
-        "appropriate", "adequate", "sufficient", "relevant", "suitable", "as needed",
-        "where necessary", "in depth", "detailed", "thorough", "comprehensive", "etc",
+      // Words that really are amounts. Asking for a number here is sensible.
+      const AMOUNTS = ["some", "several", "a few", "a range of", "a variety of", "multiple", "various"];
+      // Words that are standards, not amounts. Asking "how many is relevant?" would
+      // make the sender look like they cannot read English — so ask what the
+      // standard is instead.
+      const STANDARDS = [
+        "appropriate", "adequate", "sufficient", "relevant", "suitable",
+        "in depth", "detailed", "thorough", "comprehensive",
       ];
-      const hits = findTerms(brief, TERMS);
-      return hits.slice(0, 6).map(({ term, excerpt }) => ({
+
+      const amountHits = findTerms(brief, AMOUNTS).slice(0, 3).map(({ term, excerpt }) => ({
         id: "quantity.unquantified",
         category: "quantity" as const,
         severity: "note" as const,
-        title: `"${term}" — how much is that?`,
+        title: `"${term}" — how many is that?`,
         excerpt,
-        why: "Quantities like this are usually obvious to whoever wrote the brief and genuinely ambiguous to everyone reading it. Guessing low loses marks; guessing high loses time.",
-        question: `The brief says "${term}" — is there a number you have in mind, or a rough minimum?`,
+        why: "Amounts like this are obvious to whoever wrote the brief and genuinely ambiguous to everyone reading it. Guessing low loses marks; guessing high loses time.",
+        question: `The brief says "${term}" — is there a rough number or minimum you have in mind?`,
       }));
+
+      const standardHits = findTerms(brief, STANDARDS).slice(0, 2).map(({ term, excerpt }) => ({
+        id: "quantity.standard-unstated",
+        category: "quantity" as const,
+        severity: "note" as const,
+        title: `"${term}" — measured against what?`,
+        excerpt,
+        why: "This is a standard rather than an amount, and the standard is assumed rather than stated. Whoever wrote it has something specific in mind.",
+        question: `What would make something "${term}" for this assignment — is there an example of one that hit the mark?`,
+      }));
+
+      return [...amountHits, ...standardHits];
     },
   },
 
@@ -273,7 +348,11 @@ export const CHECKS: Check[] = [
     describes: "Group work with no stated route if it goes wrong.",
     run: (brief) => {
       if (!mentionsGroup(brief)) return [];
-      if (has(brief, ["if there are problems", "not contributing", "dispute", "conflict", "concerns?", "raise it", "come to me", "let me know"])) return [];
+      if (has(brief, [
+        "if there are problems", "not contributing", "dispute", "conflict", "concern",
+        "raise it", "come to me", "let me know", "difficult\\w*", "issue", "trouble",
+        "email me", "contact me", "speak to me", "module admin", "course admin", "get in touch",
+      ])) return [];
       return [
         {
           id: "group.no-conflict-route",
@@ -363,7 +442,9 @@ export const CHECKS: Check[] = [
     describes: "Acronyms used without being spelled out anywhere in the brief.",
     run: (brief) => {
       const found = new Map<string, string>();
-      const re = /(?<![A-Za-z])([A-Z]{2,6})(?![A-Za-z])/g;
+      // Not preceded or followed by a letter OR a digit — otherwise module codes
+      // like "PH2032" read as the acronym "PH". A tester hit exactly that.
+      const re = /(?<![A-Za-z0-9])([A-Z]{2,6})(?![A-Za-z0-9])/g;
       const COMMON = new Set(["AI","UK","US","USA","EU","UN","PDF","URL","FAQ","OK","TV","CV","ID","IT","AM","PM","PhD","BBC","NHS","CEO","DIY","API"]);
       let m: RegExpExecArray | null;
       while ((m = re.exec(brief))) {

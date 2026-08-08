@@ -33,8 +33,9 @@ export default function ChecksPage() {
           they are plain functions over the text you paste.
         </p>
         <p style={{ color: "var(--text-muted)" }}>
-          Every finding quotes the exact words that triggered it, so you can always disagree
-          with one.
+          Where a check finds something in the text, it quotes the exact words that triggered
+          it. Some checks look for what <em>isn&rsquo;t</em> there — a missing deadline has
+          nothing to quote — and those say so plainly instead.
         </p>
       </section>
 

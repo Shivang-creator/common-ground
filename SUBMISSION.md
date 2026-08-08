@@ -50,8 +50,7 @@ principle is Universal Design for Learning, and the research supports it directl
 UDL *"minimises the burden on neurodiverse students to request accommodations and
 reduces the stigma."*
 
-**Nobody discloses anything. Everyone benefits. The student it was designed for is
-the last one anybody would guess.**
+**Nobody has to disclose anything to benefit.**
 
 The clearest example is in the group tool. Everyone answers the same four
 questions about how they like to work. The output includes a group agreement that

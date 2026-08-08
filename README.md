@@ -122,8 +122,7 @@ design mindset, one where flexibility is built in from the start,"* and it
 *"minimises the burden on neurodiverse students to request accommodations and
 reduces the stigma."*
 
-**Nobody discloses anything. Everyone benefits. The student it was designed for is
-the last one anybody would guess.**
+**Nobody has to disclose anything to benefit.**
 
 ---
 

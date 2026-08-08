@@ -66,8 +66,7 @@ export default function JudgesPage() {
           whose design removes barriers that happen to fall hardest on some people.
         </p>
         <p className="font-semibold">
-          Nobody discloses anything. Everyone benefits. The student it was designed for is the
-          last one anybody would guess.
+          Nobody has to disclose anything to benefit.
         </p>
       </section>
 
@@ -86,9 +85,10 @@ export default function JudgesPage() {
               against it and comes back with roughly twenty things worth asking about.
             </p>
             <Look>
-              every finding quotes the <em>exact words</em> from the brief that triggered it. You
-              can disagree with any one of them. Nothing is a black box, and nothing is a
-              judgement about the reader — the summary says so explicitly:{" "}
+              findings that match text quote the <em>exact words</em> that triggered them, so you
+              can disagree with any one. Checks that look for something <em>missing</em> have
+              nothing to quote, and simply name what is absent. Nothing is a black box, and
+              nothing is a judgement about the reader — the summary says so explicitly:{" "}
               <em>&ldquo;None of this is a gap in you. It&rsquo;s a gap in the brief.&rdquo;</em>
             </Look>
           </Step>

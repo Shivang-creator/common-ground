@@ -77,8 +77,13 @@ Reply with JSON only, matching exactly this shape:
 }
 
 definitionOfDone: 3-7 items, each concrete and checkable. Derive only from the brief.
-workstreams: 2-5 genuinely separable parts of the work. If the brief describes
-individual work with no separable parts, return an empty array.
+Never restate a vague instruction as a completion criterion — "follow the usual
+format" is not something a student can check they have done.
+workstreams: 2-5 genuinely separable parts of the WORK ITSELF. Always return the
+same set for the same brief — a group relies on this being stable.
+Never include organisational steps as a workstream: forming a group, choosing a
+topic, reading the brief, and submitting are not work you can assign to a person.
+If the brief describes individual work with no separable parts, return an empty array.
 Omit any field the brief gives you no basis for.`;
 
 async function callProvider(p: Provider, brief: string): Promise<Interpretation> {
@@ -94,7 +99,8 @@ async function callProvider(p: Provider, brief: string): Promise<Interpretation>
       },
       body: JSON.stringify({
         model: p.model,
-        temperature: 0.2,
+        temperature: 0,
+        seed: 7,
         messages: [
           { role: "system", content: SYSTEM },
           { role: "user", content: `Assignment brief:\n\n"""\n${brief.slice(0, 12_000)}\n"""` },

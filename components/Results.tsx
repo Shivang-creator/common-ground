@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { CATEGORY_META, type CheckCategory, type DecodeResult, type Finding } from "@/lib/types";
+import { CATEGORY_META, type CheckCategory, type DecodeResult, type Finding, type Severity } from "@/lib/types";
 import { ResultSummary } from "@/components/ResultSummary";
 
 const SEV_LABEL: Record<Finding["severity"], string> = {
@@ -40,20 +40,43 @@ function CopyButton({ text, label = "Copy" }: { text: string; label?: string }) 
 export function Results({ result }: { result: DecodeResult }) {
   const { findings, interpretation } = result;
 
+  // Open on what blocks starting. Everything else is a choice, not a wall.
+  const [filter, setFilter] = useState<Severity | "all">(
+    findings.some((f) => f.severity === "blocker") ? "blocker" : "all",
+  );
+  const shown = useMemo(
+    () => (filter === "all" ? findings : findings.filter((f) => f.severity === filter)),
+    [findings, filter],
+  );
+
   const grouped = useMemo(() => {
     const m = new Map<CheckCategory, Finding[]>();
-    for (const f of findings) {
+    for (const f of shown) {
       if (!m.has(f.category)) m.set(f.category, []);
       m.get(f.category)!.push(f);
     }
     return [...m.entries()];
-  }, [findings]);
+  }, [shown]);
 
-  const questionList = useMemo(
-    () =>
-      findings.map((f, i) => `${i + 1}. ${f.question}`).join("\n"),
-    [findings],
-  );
+  // One sendable message, not a list of bullets.
+  //
+  // A tester pressed this and got 23 numbered lines including seven near-identical
+  // ones. "Nobody sends that email." So it now writes an actual email, and it
+  // copies what is on screen rather than everything.
+  const questionList = useMemo(() => {
+    const qs = shown.map((f) => f.question);
+    return [
+      "Hello,",
+      "",
+      qs.length === 1
+        ? "I've read through the brief and there's one thing I want to check before I start:"
+        : `I've read through the brief and there are a few things I'd like to check before I start:`,
+      "",
+      ...qs.map((q) => `  ${qs.length > 1 ? "\u2022 " : ""}${q}`),
+      "",
+      "Thank you.",
+    ].join("\n");
+  }, [shown]);
 
   const counts = useMemo(() => {
     const c = { blocker: 0, friction: 0, note: 0 };
@@ -76,13 +99,10 @@ export function Results({ result }: { result: DecodeResult }) {
           </p>
         ) : (
           <>
-            <ResultSummary findings={findings} />
-            <p
-              className="measure text-lg font-medium"
-              style={{ color: "var(--text)" }}
-            >
-              None of this is a gap in you. It&rsquo;s a gap in the brief — and every one of
-              them is a fair question to ask.
+            <ResultSummary findings={findings} active={filter} onChange={setFilter} />
+            <p className="measure" style={{ color: "var(--text-muted)" }}>
+              Every one of these is a fair thing to ask. The brief left them out; you
+              didn&rsquo;t miss them.
             </p>
           </>
         )}
@@ -192,7 +212,7 @@ export function Results({ result }: { result: DecodeResult }) {
               Questions worth asking
             </h2>
             <div className="no-print flex gap-2">
-              <CopyButton text={questionList} label="Copy all questions" />
+              <CopyButton text={questionList} label={filter === "all" ? "Copy as an email" : "Copy these as an email"} />
               <button type="button" className="btn btn-quiet px-3 py-1.5 text-sm" onClick={() => window.print()}>
                 Print
               </button>

@@ -44,12 +44,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <a href="#main" className="skip-link">Skip to main content</a>
         <div className="min-h-dvh flex flex-col">
           <header className="no-print border-b" style={{ borderColor: "var(--border)" }}>
-            <div className="mx-auto w-full max-w-5xl px-4 py-3 flex items-center justify-between gap-3">
-              <div className="flex items-center gap-4 sm:gap-6">
+            <div className="mx-auto w-full max-w-5xl px-4 py-3 flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 min-w-0">
                 <a href="/" className="font-semibold tracking-tight text-lg" style={{ color: "var(--text)" }}>
                   Common&nbsp;Ground
                 </a>
-                <nav aria-label="Sections" className="flex gap-3 text-sm">
+                <nav aria-label="Sections" className="flex flex-wrap gap-x-3 gap-y-1 text-sm">
                   <a href="/" className="underline-offset-4 hover:underline" style={{ color: "var(--text-muted)" }}>
                     Read a brief
                   </a>

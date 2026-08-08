@@ -47,8 +47,9 @@ export default function Home() {
             Make the unwritten rules written.
           </h1>
           <p className="text-lg sm:text-xl measure" style={{ color: "var(--text-muted)" }}>
-            Assignment briefs leave things out. Some people fill the gaps by reading the room.
-            Everyone else pays for them.
+            Assignment briefs leave things out. The answers travel by asking someone — a
+            group chat, a friend, a quick word after class. If you don&rsquo;t have that,
+            you pay for it.
           </p>
 
           <HeroFigure />
@@ -98,7 +99,10 @@ export default function Home() {
           className="w-full p-4 text-base resize-y"
         />
         <p id="brief-help" className="text-sm" style={{ color: "var(--text-muted)" }}>
-          Nothing you paste is stored. It is sent once, read, and forgotten.
+          <strong style={{ color: "var(--text)" }}>It never writes your assignment.</strong>{" "}
+          It reads the brief and hands you questions — it does not do the work, and it does not
+          rewrite your tutor&rsquo;s words. Nothing you paste is stored: it goes once to Google
+          Gemini to be read, is never used for training, and is not kept afterwards.
         </p>
 
         <div className="flex flex-wrap items-center gap-3">
@@ -166,7 +170,25 @@ export default function Home() {
               There is no account, no profile, no score, and nothing about any person is inferred,
               stored or reported to anyone.
             </li>
+            <li>
+              <strong style={{ color: "var(--text)" }}>
+                It doesn&rsquo;t replace asking for what you need.
+              </strong>{" "}
+              This removes one barrier. It is not a reason for anyone to have fewer formal
+              accommodations, and it never argues that it is.
+            </li>
           </ul>
+
+          <div className="card p-4 mt-2">
+            <p className="font-semibold mb-1" style={{ color: "var(--text)" }}>
+              If you write briefs, run yours through this before you publish it.
+            </p>
+            <p>
+              Same tool, same output. Every question it hands back is one a student would
+              otherwise have to find the confidence to ask — and if you answer them in the brief,
+              nobody in the class has to be the one who asked.
+            </p>
+          </div>
         </section>
       )}
     </div>
