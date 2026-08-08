@@ -69,7 +69,7 @@ export function ResultSummary({
           Showing {counts[active]} of {findings.length}.{" "}
           <button
             type="button"
-            className="underline font-medium"
+            className="underline font-medium inline-link"
             style={{ color: "var(--text)" }}
             onClick={() => onChange("all")}
           >

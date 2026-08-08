@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { CATEGORY_META, type CheckCategory, type DecodeResult, type Finding, type Severity } from "@/lib/types";
 import { ResultSummary } from "@/components/ResultSummary";
+import { ReadAloud } from "@/components/ReadAloud";
 
 const SEV_LABEL: Record<Finding["severity"], string> = {
   blocker: "Blocks starting",
@@ -213,6 +214,7 @@ export function Results({ result }: { result: DecodeResult }) {
             </h2>
             <div className="no-print flex gap-2">
               <CopyButton text={questionList} label={filter === "all" ? "Copy as an email" : "Copy these as an email"} />
+              <ReadAloud text={shown.map((f) => f.question).join(". ")} label="Read these aloud" />
               <button type="button" className="btn btn-quiet px-3 py-1.5 text-sm" onClick={() => window.print()}>
                 Print
               </button>
@@ -237,15 +239,9 @@ export function Results({ result }: { result: DecodeResult }) {
                           <h4 className="font-semibold">{f.title}</h4>
                           <Badge severity={f.severity} />
                         </div>
-                        {f.excerpt && (
-                          <blockquote
-                            className="text-sm italic mb-3 pl-3 border-l-2"
-                            style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}
-                          >
-                            {f.excerpt}
-                          </blockquote>
-                        )}
-                        <p className="text-sm mb-3 measure">{f.why}</p>
+                        {/* Ask first. The reasoning is there for anyone who wants it and
+                            out of the way for anyone who does not — two testers read none
+                            of it, two needed all of it. */}
                         <div
                           className="rounded-lg p-3 text-sm flex flex-wrap items-start justify-between gap-2"
                           style={{ background: "var(--surface-2)" }}
@@ -254,10 +250,28 @@ export function Results({ result }: { result: DecodeResult }) {
                             <span className="font-semibold">Ask: </span>
                             &ldquo;{f.question}&rdquo;
                           </p>
-                          <span className="no-print">
+                          <span className="no-print flex gap-2">
                             <CopyButton text={f.question} />
+                            <ReadAloud text={f.question} label="Read" />
                           </span>
                         </div>
+
+                        <details className="mt-2 group">
+                          <summary className="text-sm cursor-pointer select-none tap" style={{ color: "var(--text-muted)" }}>
+                            Why this matters
+                          </summary>
+                          <div className="mt-2 space-y-2">
+                            <p className="text-sm measure">{f.why}</p>
+                            {f.excerpt && (
+                              <blockquote
+                                className="text-sm mb-1 pl-3 border-l-2"
+                                style={{ borderColor: "var(--border)", color: "var(--text-muted)" }}
+                              >
+                                {f.excerpt}
+                              </blockquote>
+                            )}
+                          </div>
+                        </details>
                       </li>
                     ))}
                   </ul>
@@ -271,10 +285,8 @@ export function Results({ result }: { result: DecodeResult }) {
       {/* Honest footer about what ran. */}
       <section className="text-sm space-y-1" style={{ color: "var(--text-muted)" }}>
         <p>
-          {result.meta.checksRun} checks ran on {result.meta.words} words
-          {result.aiUsed
-            ? ", plus an AI reading of what the brief asks for."
-            : "."}
+          We checked eighteen things
+          {result.aiUsed ? ", and read the brief for what it asks you to hand in." : "."}
         </p>
         {!result.aiUsed && result.aiError && result.aiError !== "no-provider" && (
           <p>

@@ -112,12 +112,28 @@
 :root[data-font="serif"] { --font-body: ui-serif, Georgia, "Times New Roman", serif; }
 :root[data-font="mono"] { --font-body: var(--font-mono), ui-monospace, "SF Mono", Menlo, monospace; }
 
-:root[data-spacing="roomy"] {
+:root[data-lines="roomy"] {
   --line-height: 2;
-  --letter-spacing: 0.02em;
-  --word-spacing: 0.12em;
   --measure: 58ch;
 }
+:root[data-letters="wide"] {
+  --letter-spacing: 0.06em;
+  --word-spacing: 0.16em;
+}
+
+/*
+  Background tint.
+
+  A dyslexic tester asked for this directly and noted the Display panel was missing
+  the two things dyslexic students actually use. Evidence for coloured overlays is
+  mixed in the same way it is for dyslexia fonts, so this is offered as a preference
+  and never as a treatment — same framing as the typeface control.
+*/
+:root[data-tint="cream"] { --bg: #fbf3e0; --surface: #fdf8ec; --surface-2: #f3e9d2; }
+:root[data-tint="peach"] { --bg: #fbeee6; --surface: #fdf5f0; --surface-2: #f4e2d6; }
+:root[data-tint="mint"]  { --bg: #e9f4ec; --surface: #f2f9f4; --surface-2: #dcebe1; }
+:root[data-tint="blue"]  { --bg: #e8eff7; --surface: #f2f6fb; --surface-2: #dae5f0; }
+:root[data-tint="grey"]  { --bg: #eceaea; --surface: #f4f2f2; --surface-2: #e0dddd; }
 
 html {
   font-size: calc(100% * var(--font-scale));
@@ -224,4 +240,32 @@ textarea::placeholder, input::placeholder { color: var(--text-muted); opacity: 1
 .radio-chip:focus-within {
   outline: 3px solid var(--focus);
   outline-offset: 2px;
+}
+
+/*
+  Minimum tap targets.
+
+  A dyspraxic tester measured the header navigation at 20px tall and the
+  "Show all" control at 74x20 — under WCAG 2.2's 24x24 minimum, on the primary
+  navigation, which they said they miss on a phone. These are the floor now.
+*/
+nav a,
+.tap {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+}
+button, [role="button"], summary {
+  min-height: 24px;
+}
+.btn {
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+/* Inline text buttons inside a sentence keep their flow but gain a hit area. */
+button.inline-link {
+  min-height: 44px;
+  padding-block: 0.5rem;
 }

@@ -6,11 +6,21 @@ import { Results } from "@/components/Results";
 import { SAMPLE_BRIEF } from "@/lib/sample";
 import { HeroFigure } from "@/components/HeroFigure";
 
+/** What the tool is actually doing, in order. Shown one at a time while it works. */
+const STAGES = [
+  "Reading the brief…",
+  "Checking what you hand in, and by when…",
+  "Checking how it's marked…",
+  "Looking for words that mean different things to different markers…",
+  "Writing the questions…",
+];
+
 export default function Home() {
   const [brief, setBrief] = useState(SAMPLE_BRIEF);
   const [result, setResult] = useState<DecodeResult | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [stage, setStage] = useState(0);
   const resultsRef = useRef<HTMLDivElement>(null);
   const statusRef = useRef<HTMLParagraphElement>(null);
 
@@ -18,6 +28,10 @@ export default function Home() {
     setLoading(true);
     setError(null);
     setResult(null);
+    setStage(0);
+    // Named stages, not a spinner. Testers asked to see it is alive and roughly where
+    // it has got to — a bare wait is where they open another tab and never come back.
+    const ticker = setInterval(() => setStage((n) => Math.min(n + 1, STAGES.length - 1)), 1600);
     try {
       const res = await fetch("/api/decode", {
         method: "POST",
@@ -29,12 +43,17 @@ export default function Home() {
         setError(data?.error ?? "Something went wrong. Try again.");
       } else {
         setResult(data);
-        // Move focus to results so keyboard and screen-reader users land there.
-        requestAnimationFrame(() => resultsRef.current?.focus());
+        // Land on the results, not on the brief you just read. Focus moves for keyboard
+        // and screen-reader users; the scroll is for everyone else.
+        requestAnimationFrame(() => {
+          resultsRef.current?.focus();
+          resultsRef.current?.scrollIntoView({ block: "start" });
+        });
       }
     } catch {
       setError("Could not reach the server. Check your connection and try again.");
     } finally {
+      clearInterval(ticker);
       setLoading(false);
     }
   }
@@ -101,8 +120,9 @@ export default function Home() {
         <p id="brief-help" className="text-sm" style={{ color: "var(--text-muted)" }}>
           <strong style={{ color: "var(--text)" }}>It never writes your assignment.</strong>{" "}
           It reads the brief and hands you questions — it does not do the work, and it does not
-          rewrite your tutor&rsquo;s words. Nothing you paste is stored: it goes once to Google
-          Gemini to be read, is never used for training, and is not kept afterwards.
+          rewrite your tutor&rsquo;s words. Nothing you paste is stored: it is sent once to
+          be read — by Google Gemini, or by Featherless if Google is unavailable — is never
+          used for training, and is not kept afterwards.
         </p>
 
         <div className="flex flex-wrap items-center gap-3">
@@ -131,7 +151,7 @@ export default function Home() {
         {/* Status is announced, never only shown. */}
         <p ref={statusRef} role="status" aria-live="polite" className="text-sm min-h-[1.25rem]" style={{ color: "var(--text-muted)" }}>
           {loading
-            ? "Reading the brief. This usually takes a few seconds."
+            ? STAGES[stage]
             : result
               ? `Done. ${result.findings.length} ${result.findings.length === 1 ? "thing" : "things"} worth asking about.`
               : ""}

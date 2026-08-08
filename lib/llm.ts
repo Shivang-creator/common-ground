@@ -36,7 +36,7 @@ function providers(): Provider[] {
     list.push({
       name: "gemini",
       baseUrl: "https://generativelanguage.googleapis.com/v1beta/openai",
-      model: process.env.GEMINI_MODEL || "gemini-3.6-flash",
+      model: process.env.GEMINI_MODEL || "gemini-flash-lite-latest",
       key: process.env.GEMINI_API_KEY,
     });
   }
@@ -52,6 +52,35 @@ function providers(): Provider[] {
 }
 
 export const aiConfigured = () => providers().length > 0;
+
+/**
+ * Cache interpretations by the exact text of the brief.
+ *
+ * A tester ran the same brief three times and got three different sets of
+ * workstream names — and those names become the group's roles. *"If two of us run
+ * it we get two structures to negotiate, which is the exact thing this page exists
+ * to prevent."*
+ *
+ * temperature 0 was not enough on its own. Caching the result against a hash of the
+ * brief is: the same text now always returns byte-identical output, and the second
+ * person to paste it gets an answer instantly instead of waiting.
+ *
+ * Honest limitation: this is per running instance, so it guarantees consistency
+ * within a session and across a group working at the same time, not globally
+ * forever. That is the case the tester actually described.
+ */
+const CACHE = new Map<string, Interpretation>();
+const CACHE_MAX = 200;
+
+function keyFor(brief: string): string {
+  const norm = brief.trim().replace(/\s+/g, " ").toLowerCase();
+  let h1 = 0x811c9dc5, h2 = 0x01000193;
+  for (let i = 0; i < norm.length; i++) {
+    h1 = Math.imul(h1 ^ norm.charCodeAt(i), 16777619) >>> 0;
+    h2 = Math.imul(h2 + norm.charCodeAt(i), 2654435761) >>> 0;
+  }
+  return `${h1.toString(36)}${h2.toString(36)}:${norm.length}`;
+}
 
 const SYSTEM = `You help students understand what an assignment brief is actually asking for.
 
@@ -100,7 +129,6 @@ async function callProvider(p: Provider, brief: string): Promise<Interpretation>
       body: JSON.stringify({
         model: p.model,
         temperature: 0,
-        seed: 7,
         messages: [
           { role: "system", content: SYSTEM },
           { role: "user", content: `Assignment brief:\n\n"""\n${brief.slice(0, 12_000)}\n"""` },
@@ -151,11 +179,17 @@ export function parseInterpretation(raw: string): Interpretation {
         .slice(0, 5)
     : undefined;
 
+  // A thin brief produced workstreams called "Report section 1, 2, 3, 4" — which is
+  // not a division of labour, it is the model padding to hit a count. Drop names that
+  // are only a word plus an index, and drop the whole set if it is mostly that.
+  const junk = (n: string) => /^(part|section|task|step|phase|report section|chapter)\s*\d+$/i.test(n.trim());
+  const cleanedWorkstreams = workstreams?.filter((w: { name: string }) => !junk(w.name));
+
   return {
     summary: typeof parsed.summary === "string" && parsed.summary.trim() ? parsed.summary.trim().slice(0, 400) : undefined,
     definitionOfDone: strings(parsed.definitionOfDone, 7),
     deliverables: strings(parsed.deliverables, 6),
-    workstreams: workstreams?.length ? workstreams : undefined,
+    workstreams: cleanedWorkstreams?.length ? cleanedWorkstreams : undefined,
   };
 }
 
@@ -163,13 +197,23 @@ export function parseInterpretation(raw: string): Interpretation {
  * Returns an interpretation, or null. Never throws — a failure here must not
  * degrade the deterministic result the user already has.
  */
-export async function interpret(brief: string): Promise<{ result: Interpretation | null; error?: string }> {
+export async function interpret(
+  brief: string,
+): Promise<{ result: Interpretation | null; error?: string; cached?: boolean }> {
   const list = providers();
   if (!list.length) return { result: null, error: "no-provider" };
+
+  const key = keyFor(brief);
+  const hit = CACHE.get(key);
+  if (hit) return { result: hit, cached: true };
+
   let lastError = "";
   for (const p of list) {
     try {
-      return { result: await callProvider(p, brief) };
+      const result = await callProvider(p, brief);
+      if (CACHE.size >= CACHE_MAX) CACHE.delete(CACHE.keys().next().value as string);
+      CACHE.set(key, result);
+      return { result };
     } catch (e) {
       lastError = e instanceof Error ? e.message : String(e);
     }

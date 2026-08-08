@@ -6,7 +6,9 @@ type Prefs = {
   theme?: "light" | "dark";
   contrast?: "normal" | "high";
   font?: "sans" | "serif" | "mono";
-  spacing?: "normal" | "roomy";
+  lines?: "normal" | "roomy";
+  letters?: "normal" | "wide";
+  tint?: "none" | "cream" | "peach" | "mint" | "blue" | "grey";
   motion?: "system" | "none";
   scale?: string;
 };
@@ -19,7 +21,9 @@ function apply(p: Prefs) {
   p.theme ? r.setAttribute("data-theme", p.theme) : r.removeAttribute("data-theme");
   p.contrast ? r.setAttribute("data-contrast", p.contrast) : r.removeAttribute("data-contrast");
   r.setAttribute("data-font", p.font ?? "sans");
-  p.spacing ? r.setAttribute("data-spacing", p.spacing) : r.removeAttribute("data-spacing");
+  p.lines === "roomy" ? r.setAttribute("data-lines", "roomy") : r.removeAttribute("data-lines");
+  p.letters === "wide" ? r.setAttribute("data-letters", "wide") : r.removeAttribute("data-letters");
+  p.tint && p.tint !== "none" ? r.setAttribute("data-tint", p.tint) : r.removeAttribute("data-tint");
   p.motion ? r.setAttribute("data-motion", p.motion) : r.removeAttribute("data-motion");
   r.style.setProperty("--font-scale", p.scale ?? "1");
 }
@@ -144,13 +148,40 @@ export function DisplaySettings() {
             ))}
           </Group>
 
-          <Group label="Spacing" hint="More space between lines, letters and words.">
-            <Opt on={(prefs.spacing ?? "normal") === "normal"} onClick={() => set({ spacing: "normal" })}>
+          <Group label="Line spacing" hint="Space between lines of text.">
+            <Opt on={(prefs.lines ?? "normal") === "normal"} onClick={() => set({ lines: "normal" })}>
               Normal
             </Opt>
-            <Opt on={prefs.spacing === "roomy"} onClick={() => set({ spacing: "roomy" })}>
+            <Opt on={prefs.lines === "roomy"} onClick={() => set({ lines: "roomy" })}>
               Roomy
             </Opt>
+          </Group>
+
+          <Group label="Letter spacing" hint="Space between letters and words. Separate from line spacing on purpose — people usually want one and not the other.">
+            <Opt on={(prefs.letters ?? "normal") === "normal"} onClick={() => set({ letters: "normal" })}>
+              Normal
+            </Opt>
+            <Opt on={prefs.letters === "wide"} onClick={() => set({ letters: "wide" })}>
+              Wide
+            </Opt>
+          </Group>
+
+          <Group
+            label="Background tint"
+            hint="Some people read more easily on a tint. Evidence is mixed, like the typeface — pick what feels easier, there is no correct answer."
+          >
+            {([
+              ["none", "None"],
+              ["cream", "Cream"],
+              ["peach", "Peach"],
+              ["mint", "Mint"],
+              ["blue", "Blue"],
+              ["grey", "Grey"],
+            ] as const).map(([v, label]) => (
+              <Opt key={v} on={(prefs.tint ?? "none") === v} onClick={() => set({ tint: v })}>
+                {label}
+              </Opt>
+            ))}
           </Group>
 
           <Group label="Typeface" hint="Pick whichever is easier for you to read. There is no correct answer.">

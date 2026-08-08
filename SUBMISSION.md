@@ -259,8 +259,7 @@ Show the split, then the agreement. **This is the moment of the whole demo:**
 **2:20–2:45 — The design decision**
 > "There's no account, no profile, no score. It never works out who's
 > neurodivergent, because it never models a person at all — the only thing it reads
-> is a document. Nobody discloses anything to benefit from this. The student it was
-> designed for is the last one anybody would guess."
+> is a document. Nobody has to disclose anything to benefit from it."
 
 **2:45–3:00 — Close**
 Open the Display panel, bump text size, switch contrast.

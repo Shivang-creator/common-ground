@@ -29,7 +29,9 @@ const BOOT = `(function(){try{var p=JSON.parse(localStorage.getItem("cg:display"
 if(p.theme)r.setAttribute("data-theme",p.theme);
 if(p.contrast)r.setAttribute("data-contrast",p.contrast);
 if(p.font)r.setAttribute("data-font",p.font);
-if(p.spacing)r.setAttribute("data-spacing",p.spacing);
+if(p.lines)r.setAttribute("data-lines",p.lines);
+if(p.letters)r.setAttribute("data-letters",p.letters);
+if(p.tint)r.setAttribute("data-tint",p.tint);
 if(p.motion)r.setAttribute("data-motion",p.motion);
 if(p.scale)r.style.setProperty("--font-scale",p.scale);
 }catch(e){}})();`;
