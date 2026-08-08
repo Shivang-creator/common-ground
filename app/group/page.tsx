@@ -37,6 +37,9 @@ export default function GroupPage() {
   const [members, setMembers] = useState<MemberPrefs[]>([blank(1), blank(2)]);
   const [result, setResult] = useState<AllocationResult | null>(null);
   const [handedOver, setHandedOver] = useState(false);
+  // Every ranking tap is undoable. A dyspraxic tester: "if I mis-tap a ranking I
+  // don't know how to take it back without starting over."
+  const [history, setHistory] = useState<MemberPrefs[][]>([]);
 
   // If the brief decoder found the parts of the work, start from those rather than
   // making someone retype them. Cleared once used, so it never silently reappears.
@@ -64,7 +67,17 @@ export default function GroupPage() {
     members.every((m) => m.name.trim() && m.wants.length > 0);
 
   const update = (id: string, patch: Partial<MemberPrefs>) =>
-    setMembers((ms) => ms.map((m) => (m.id === id ? { ...m, ...patch } : m)));
+    setMembers((ms) => {
+      setHistory((h) => [...h.slice(-19), ms]);
+      return ms.map((m) => (m.id === id ? { ...m, ...patch } : m));
+    });
+
+  const undo = () =>
+    setHistory((h) => {
+      if (!h.length) return h;
+      setMembers(h[h.length - 1]);
+      return h.slice(0, -1);
+    });
 
   const toggleWant = (m: MemberPrefs, ws: string) => {
     const has = m.wants.includes(ws);
@@ -222,6 +235,15 @@ export default function GroupPage() {
                   })}
                 </div>
               )}
+              {m.wants.length > 0 && (
+                <button
+                  type="button"
+                  className="btn btn-quiet px-3 py-1.5 text-sm mt-2"
+                  onClick={() => update(m.id, { wants: [] })}
+                >
+                  Clear {m.name || "these"} choices
+                </button>
+              )}
             </fieldset>
 
             <div className="grid gap-4 sm:grid-cols-3">
@@ -264,6 +286,14 @@ export default function GroupPage() {
         ))}
 
         <div className="flex flex-wrap gap-3">
+          <button
+            type="button"
+            className="btn btn-quiet px-4 py-2"
+            disabled={!history.length}
+            onClick={undo}
+          >
+            ↶ Undo last tap
+          </button>
           <button
             type="button"
             className="btn btn-quiet px-4 py-2"

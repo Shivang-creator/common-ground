@@ -6,6 +6,7 @@ import { Results } from "@/components/Results";
 import { SAMPLE_BRIEF } from "@/lib/sample";
 import { HeroFigure } from "@/components/HeroFigure";
 import { readSharedBundle, mergeAnswers, clearShareFromUrl } from "@/lib/answers";
+import { BriefInput } from "@/components/BriefInput";
 
 /** What the tool is actually doing, in order. Shown one at a time while it works. */
 const STAGES = [
@@ -130,6 +131,15 @@ export default function Home() {
             Clear
           </button>
         </div>
+
+        <BriefInput
+          disabled={loading}
+          onText={(t) => {
+            setBrief(t);
+            setResult(null);
+            setError(null);
+          }}
+        />
 
         <textarea
           id="brief"
