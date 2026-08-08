@@ -1,9 +1,14 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { CATEGORY_META, type CheckCategory, type DecodeResult, type Finding, type Severity } from "@/lib/types";
 import { ResultSummary } from "@/components/ResultSummary";
 import { ReadAloud } from "@/components/ReadAloud";
+import { AnswerBox } from "@/components/AnswerBox";
+import {
+  loadAnswers, saveAnswer, removeAnswer, questionKey, shareLink,
+  type Answer,
+} from "@/lib/answers";
 
 const SEV_LABEL: Record<Finding["severity"], string> = {
   blocker: "Blocks starting",
@@ -38,8 +43,15 @@ function CopyButton({ text, label = "Copy" }: { text: string; label?: string }) 
   );
 }
 
-export function Results({ result }: { result: DecodeResult }) {
+export function Results({ result, brief }: { result: DecodeResult; brief: string }) {
   const { findings, interpretation } = result;
+
+  // Answers the group has already collected for this brief.
+  const [answers, setAnswers] = useState<Record<string, Answer>>({});
+  useEffect(() => setAnswers(loadAnswers(brief)), [brief]);
+
+  const answeredCount = findings.filter((f) => answers[questionKey(f.question)]).length;
+  const stillToAsk = findings.length - answeredCount;
 
   // Open on what blocks starting. Everything else is a choice, not a wall.
   const [filter, setFilter] = useState<Severity | "all">(
@@ -65,7 +77,9 @@ export function Results({ result }: { result: DecodeResult }) {
   // ones. "Nobody sends that email." So it now writes an actual email, and it
   // copies what is on screen rather than everything.
   const questionList = useMemo(() => {
-    const qs = shown.map((f) => f.question);
+    // Only what is still genuinely unanswered. This is the point of the whole
+    // feature: the tenth person in a group emails the tutor one question, not five.
+    const qs = shown.filter((f) => !answers[questionKey(f.question)]).map((f) => f.question);
     return [
       "Hello,",
       "",
@@ -77,7 +91,7 @@ export function Results({ result }: { result: DecodeResult }) {
       "",
       "Thank you.",
     ].join("\n");
-  }, [shown]);
+  }, [shown, answers]);
 
   const counts = useMemo(() => {
     const c = { blocker: 0, friction: 0, note: 0 };
@@ -205,6 +219,45 @@ export function Results({ result }: { result: DecodeResult }) {
         </section>
       ) : null}
 
+      {/* The answer loop.
+          Three testers found the same hole: thirty students send thirty identical
+          emails, the tutor stops answering, and the tool stops working. This is the
+          fix they described — one person asks, the answer travels, everyone else's
+          email gets shorter. */}
+      {findings.length > 0 && (
+        <section aria-labelledby="loop-h" className="card p-4 sm:p-5">
+          <h2 id="loop-h" className="font-semibold mb-1">
+            {answeredCount === 0
+              ? "Before you send it — has anyone already asked?"
+              : `${answeredCount} of these ${answeredCount === 1 ? "has" : "have"} been answered`}
+          </h2>
+          <p className="text-sm measure" style={{ color: "var(--text-muted)" }}>
+            {answeredCount === 0 ? (
+              <>
+                If a tutor answers one of these, write it down here. It drops out of the
+                email — and if you share it, out of everyone else&rsquo;s too. Thirty people
+                asking the same five questions is how a tutor stops replying.
+              </>
+            ) : (
+              <>
+                {stillToAsk === 0
+                  ? "Nothing left to ask. The brief is fully answered for your group."
+                  : `Your email now has ${stillToAsk} question${stillToAsk === 1 ? "" : "s"} in it instead of ${findings.length}.`}{" "}
+                Send the link to your group so nobody asks these again.
+              </>
+            )}
+          </p>
+          {answeredCount > 0 && (
+            <div className="mt-3 no-print">
+              <CopyButton
+                text={shareLink(brief, answers)}
+                label="Copy a link with these answers"
+              />
+            </div>
+          )}
+        </section>
+      )}
+
       {/* The questions — the actual product */}
       {findings.length > 0 && (
         <section aria-labelledby="questions-h">
@@ -255,6 +308,18 @@ export function Results({ result }: { result: DecodeResult }) {
                             <ReadAloud text={f.question} label="Read" />
                           </span>
                         </div>
+
+                        <AnswerBox
+                          answer={answers[questionKey(f.question)]}
+                          onSave={(a) => {
+                            saveAnswer(brief, f.question, a);
+                            setAnswers(loadAnswers(brief));
+                          }}
+                          onRemove={() => {
+                            removeAnswer(brief, f.question);
+                            setAnswers(loadAnswers(brief));
+                          }}
+                        />
 
                         <details className="mt-2 group">
                           <summary className="text-sm cursor-pointer select-none tap" style={{ color: "var(--text-muted)" }}>

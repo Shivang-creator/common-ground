@@ -1,10 +1,11 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import type { DecodeResult } from "@/lib/types";
 import { Results } from "@/components/Results";
 import { SAMPLE_BRIEF } from "@/lib/sample";
 import { HeroFigure } from "@/components/HeroFigure";
+import { readSharedBundle, mergeAnswers, clearShareFromUrl } from "@/lib/answers";
 
 /** What the tool is actually doing, in order. Shown one at a time while it works. */
 const STAGES = [
@@ -21,8 +22,29 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [stage, setStage] = useState(0);
+  // The exact text the current result came from — answers attach to this, not to
+  // whatever is in the textarea now.
+  const [decodedBrief, setDecodedBrief] = useState("");
+  const [imported, setImported] = useState<number | null>(null);
   const resultsRef = useRef<HTMLDivElement>(null);
   const statusRef = useRef<HTMLParagraphElement>(null);
+
+  // A group member opening a shared link: fold their answers in before anything else.
+  useEffect(() => {
+    const bundle = readSharedBundle();
+    if (bundle) {
+      const added = mergeAnswers(bundle);
+      setImported(added);
+      clearShareFromUrl();
+    }
+    // Bring back the last brief so closing the tab does not lose your place —
+    // an ADHD tester: "something that survives me closing the tab; right now if I
+    // come back tomorrow it's gone."
+    try {
+      const last = localStorage.getItem("cg:lastBrief");
+      if (last) setBrief(last);
+    } catch {}
+  }, []);
 
   async function decode(text: string) {
     setLoading(true);
@@ -43,6 +65,8 @@ export default function Home() {
         setError(data?.error ?? "Something went wrong. Try again.");
       } else {
         setResult(data);
+        setDecodedBrief(text);
+        try { localStorage.setItem("cg:lastBrief", text); } catch {}
         // Land on the results, not on the brief you just read. Focus moves for keyboard
         // and screen-reader users; the scroll is for everyone else.
         requestAnimationFrame(() => {
@@ -157,6 +181,14 @@ export default function Home() {
               : ""}
         </p>
 
+        {imported !== null && (
+          <p className="sev-note rounded-lg p-3 text-sm" role="status">
+            {imported > 0
+              ? `Loaded ${imported} answer${imported === 1 ? "" : "s"} your group already got from the tutor. Those questions are out of your email.`
+              : "Your group's answers were already saved here — nothing new to add."}
+          </p>
+        )}
+
         {error && (
           <p className="sev-blocker rounded-lg p-3 text-sm" role="alert">
             {error}
@@ -166,7 +198,7 @@ export default function Home() {
 
       {result && (
         <div ref={resultsRef} tabIndex={-1} aria-label="Results">
-          <Results result={result} />
+          <Results result={result} brief={decodedBrief} />
         </div>
       )}
 
